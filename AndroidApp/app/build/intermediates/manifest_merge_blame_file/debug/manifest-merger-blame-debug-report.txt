@@ -1,0 +1,192 @@
+1<?xml version="1.0" encoding="utf-8"?>
+2<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+3    package="com.clj.autographer"
+4    android:versionCode="240"
+5    android:versionName="2.4.0" >
+6
+7    <uses-sdk
+8        android:minSdkVersion="16"
+8-->/Users/jin/workspace/School/Capstone/AutoGrapher/AndroidApp/app/src/main/AndroidManifest.xml
+9        android:targetSdkVersion="30" />
+9-->/Users/jin/workspace/School/Capstone/AutoGrapher/AndroidApp/app/src/main/AndroidManifest.xml
+10
+11    <uses-permission android:name="android.permission.BLUETOOTH" />
+11-->/Users/jin/workspace/School/Capstone/AutoGrapher/AndroidApp/app/src/main/AndroidManifest.xml:5:5-68
+11-->/Users/jin/workspace/School/Capstone/AutoGrapher/AndroidApp/app/src/main/AndroidManifest.xml:5:22-65
+12    <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" />
+12-->/Users/jin/workspace/School/Capstone/AutoGrapher/AndroidApp/app/src/main/AndroidManifest.xml:6:5-74
+12-->/Users/jin/workspace/School/Capstone/AutoGrapher/AndroidApp/app/src/main/AndroidManifest.xml:6:22-71
+13    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+13-->/Users/jin/workspace/School/Capstone/AutoGrapher/AndroidApp/app/src/main/AndroidManifest.xml:7:5-81
+13-->/Users/jin/workspace/School/Capstone/AutoGrapher/AndroidApp/app/src/main/AndroidManifest.xml:7:22-78
+14    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+14-->/Users/jin/workspace/School/Capstone/AutoGrapher/AndroidApp/app/src/main/AndroidManifest.xml:8:5-79
+14-->/Users/jin/workspace/School/Capstone/AutoGrapher/AndroidApp/app/src/main/AndroidManifest.xml:8:22-76
+15    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+15-->[com.wonderkiln:camerakit:0.13.2] /Users/jin/.gradle/caches/transforms-2/files-2.1/b9feeea32256aa03d5d228c88106f1fe/jetified-camerakit-0.13.2/AndroidManifest.xml:10:5-81
+15-->[com.wonderkiln:camerakit:0.13.2] /Users/jin/.gradle/caches/transforms-2/files-2.1/b9feeea32256aa03d5d228c88106f1fe/jetified-camerakit-0.13.2/AndroidManifest.xml:10:22-78
+16    <uses-permission android:name="android.permission.CAMERA" />
+16-->[com.wonderkiln:camerakit:0.13.2] /Users/jin/.gradle/caches/transforms-2/files-2.1/b9feeea32256aa03d5d228c88106f1fe/jetified-camerakit-0.13.2/AndroidManifest.xml:11:5-65
+16-->[com.wonderkiln:camerakit:0.13.2] /Users/jin/.gradle/caches/transforms-2/files-2.1/b9feeea32256aa03d5d228c88106f1fe/jetified-camerakit-0.13.2/AndroidManifest.xml:11:22-62
+17    <uses-permission android:name="android.permission.RECORD_AUDIO" />
+17-->[com.wonderkiln:camerakit:0.13.2] /Users/jin/.gradle/caches/transforms-2/files-2.1/b9feeea32256aa03d5d228c88106f1fe/jetified-camerakit-0.13.2/AndroidManifest.xml:12:5-71
+17-->[com.wonderkiln:camerakit:0.13.2] /Users/jin/.gradle/caches/transforms-2/files-2.1/b9feeea32256aa03d5d228c88106f1fe/jetified-camerakit-0.13.2/AndroidManifest.xml:12:22-68
+18
+19    <uses-feature android:name="android.hardware.camera" />
+19-->[com.wonderkiln:camerakit:0.13.2] /Users/jin/.gradle/caches/transforms-2/files-2.1/b9feeea32256aa03d5d228c88106f1fe/jetified-camerakit-0.13.2/AndroidManifest.xml:14:5-60
+19-->[com.wonderkiln:camerakit:0.13.2] /Users/jin/.gradle/caches/transforms-2/files-2.1/b9feeea32256aa03d5d228c88106f1fe/jetified-camerakit-0.13.2/AndroidManifest.xml:14:19-57
+20    <uses-feature
+20-->[com.wonderkiln:camerakit:0.13.2] /Users/jin/.gradle/caches/transforms-2/files-2.1/b9feeea32256aa03d5d228c88106f1fe/jetified-camerakit-0.13.2/AndroidManifest.xml:15:5-17:36
+21        android:name="android.hardware.camera.autofocus"
+21-->[com.wonderkiln:camerakit:0.13.2] /Users/jin/.gradle/caches/transforms-2/files-2.1/b9feeea32256aa03d5d228c88106f1fe/jetified-camerakit-0.13.2/AndroidManifest.xml:16:9-57
+22        android:required="false" />
+22-->[com.wonderkiln:camerakit:0.13.2] /Users/jin/.gradle/caches/transforms-2/files-2.1/b9feeea32256aa03d5d228c88106f1fe/jetified-camerakit-0.13.2/AndroidManifest.xml:17:9-33
+23    <uses-feature
+23-->[com.wonderkiln:camerakit:0.13.2] /Users/jin/.gradle/caches/transforms-2/files-2.1/b9feeea32256aa03d5d228c88106f1fe/jetified-camerakit-0.13.2/AndroidManifest.xml:18:5-20:36
+24        android:name="android.hardware.camera.front"
+24-->[com.wonderkiln:camerakit:0.13.2] /Users/jin/.gradle/caches/transforms-2/files-2.1/b9feeea32256aa03d5d228c88106f1fe/jetified-camerakit-0.13.2/AndroidManifest.xml:19:9-53
+25        android:required="false" />
+25-->[com.wonderkiln:camerakit:0.13.2] /Users/jin/.gradle/caches/transforms-2/files-2.1/b9feeea32256aa03d5d228c88106f1fe/jetified-camerakit-0.13.2/AndroidManifest.xml:20:9-33
+26    <uses-feature
+26-->[com.wonderkiln:camerakit:0.13.2] /Users/jin/.gradle/caches/transforms-2/files-2.1/b9feeea32256aa03d5d228c88106f1fe/jetified-camerakit-0.13.2/AndroidManifest.xml:21:5-23:36
+27        android:name="android.hardware.microphone"
+27-->[com.wonderkiln:camerakit:0.13.2] /Users/jin/.gradle/caches/transforms-2/files-2.1/b9feeea32256aa03d5d228c88106f1fe/jetified-camerakit-0.13.2/AndroidManifest.xml:22:9-51
+28        android:required="false" />
+28-->[com.wonderkiln:camerakit:0.13.2] /Users/jin/.gradle/caches/transforms-2/files-2.1/b9feeea32256aa03d5d228c88106f1fe/jetified-camerakit-0.13.2/AndroidManifest.xml:23:9-33
+29
+30    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" /> <!-- Although the *SdkVersion is captured in gradle build files, this is required for non gradle builds -->
+31    <!-- <uses-sdk android:minSdkVersion="14"/> -->
+32    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+32-->[com.google.android.datatransport:transport-backend-cct:2.3.2] /Users/jin/.gradle/caches/transforms-2/files-2.1/cac7107719c5cdb39c8e532b9e13dab3/transport-backend-cct-2.3.2/AndroidManifest.xml:25:5-79
+32-->[com.google.android.datatransport:transport-backend-cct:2.3.2] /Users/jin/.gradle/caches/transforms-2/files-2.1/cac7107719c5cdb39c8e532b9e13dab3/transport-backend-cct-2.3.2/AndroidManifest.xml:25:22-76
+33    <uses-permission android:name="android.permission.INTERNET" />
+33-->[com.google.android.datatransport:transport-backend-cct:2.3.2] /Users/jin/.gradle/caches/transforms-2/files-2.1/cac7107719c5cdb39c8e532b9e13dab3/transport-backend-cct-2.3.2/AndroidManifest.xml:26:5-67
+33-->[com.google.android.datatransport:transport-backend-cct:2.3.2] /Users/jin/.gradle/caches/transforms-2/files-2.1/cac7107719c5cdb39c8e532b9e13dab3/transport-backend-cct-2.3.2/AndroidManifest.xml:26:22-64
+34
+35    <application
+35-->/Users/jin/workspace/School/Capstone/AutoGrapher/AndroidApp/app/src/main/AndroidManifest.xml:10:5-31:19
+36        android:allowBackup="true"
+36-->/Users/jin/workspace/School/Capstone/AutoGrapher/AndroidApp/app/src/main/AndroidManifest.xml:11:9-35
+37        android:appComponentFactory="androidx.core.app.CoreComponentFactory"
+37-->[androidx.core:core:1.3.1] /Users/jin/.gradle/caches/transforms-2/files-2.1/b234a824af7fd98a5c54fc0522824a91/core-1.3.1/AndroidManifest.xml:24:18-86
+38        android:debuggable="true"
+39        android:label="@string/app_name"
+39-->/Users/jin/workspace/School/Capstone/AutoGrapher/AndroidApp/app/src/main/AndroidManifest.xml:12:9-41
+40        android:supportsRtl="true"
+40-->/Users/jin/workspace/School/Capstone/AutoGrapher/AndroidApp/app/src/main/AndroidManifest.xml:13:9-35
+41        android:testOnly="true"
+42        android:theme="@style/AppTheme" >
+42-->/Users/jin/workspace/School/Capstone/AutoGrapher/AndroidApp/app/src/main/AndroidManifest.xml:14:9-40
+43        <activity android:name="com.clj.autographer.MainActivity" >
+43-->/Users/jin/workspace/School/Capstone/AutoGrapher/AndroidApp/app/src/main/AndroidManifest.xml:16:9-22:20
+43-->/Users/jin/workspace/School/Capstone/AutoGrapher/AndroidApp/app/src/main/AndroidManifest.xml:16:19-66
+44            <intent-filter>
+44-->/Users/jin/workspace/School/Capstone/AutoGrapher/AndroidApp/app/src/main/AndroidManifest.xml:17:13-21:29
+45                <action android:name="android.intent.action.MAIN" />
+45-->/Users/jin/workspace/School/Capstone/AutoGrapher/AndroidApp/app/src/main/AndroidManifest.xml:18:17-69
+45-->/Users/jin/workspace/School/Capstone/AutoGrapher/AndroidApp/app/src/main/AndroidManifest.xml:18:25-66
+46
+47                <category android:name="android.intent.category.LAUNCHER" />
+47-->/Users/jin/workspace/School/Capstone/AutoGrapher/AndroidApp/app/src/main/AndroidManifest.xml:20:17-77
+47-->/Users/jin/workspace/School/Capstone/AutoGrapher/AndroidApp/app/src/main/AndroidManifest.xml:20:27-74
+48            </intent-filter>
+49        </activity>
+50        <activity android:name="com.clj.autographer.operation.OperationActivity" />
+50-->/Users/jin/workspace/School/Capstone/AutoGrapher/AndroidApp/app/src/main/AndroidManifest.xml:24:9-84
+50-->/Users/jin/workspace/School/Capstone/AutoGrapher/AndroidApp/app/src/main/AndroidManifest.xml:24:19-81
+51        <activity android:name="com.clj.autographer.camera.CameraMainActivity" >
+51-->/Users/jin/workspace/School/Capstone/AutoGrapher/AndroidApp/app/src/main/AndroidManifest.xml:25:9-27:20
+51-->/Users/jin/workspace/School/Capstone/AutoGrapher/AndroidApp/app/src/main/AndroidManifest.xml:25:19-79
+52        </activity>
+53        <activity android:name="com.clj.autographer.camera.CameraMainActivity2" >
+53-->/Users/jin/workspace/School/Capstone/AutoGrapher/AndroidApp/app/src/main/AndroidManifest.xml:28:9-29:20
+53-->/Users/jin/workspace/School/Capstone/AutoGrapher/AndroidApp/app/src/main/AndroidManifest.xml:28:19-80
+54        </activity>
+55
+56        <service
+56-->[com.google.mlkit:pose-detection-common:17.0.1-beta1] /Users/jin/.gradle/caches/transforms-2/files-2.1/e4524c64123240a3f2bb080e2266256a/pose-detection-common-17.0.1-beta1/AndroidManifest.xml:8:9-14:19
+57            android:name="com.google.mlkit.common.internal.MlKitComponentDiscoveryService"
+57-->[com.google.mlkit:pose-detection-common:17.0.1-beta1] /Users/jin/.gradle/caches/transforms-2/files-2.1/e4524c64123240a3f2bb080e2266256a/pose-detection-common-17.0.1-beta1/AndroidManifest.xml:9:13-91
+58            android:directBootAware="true"
+58-->[com.google.mlkit:common:17.1.0] /Users/jin/.gradle/caches/transforms-2/files-2.1/751ae90ff7dddecf4b2394c0b9f9f00d/common-17.1.0/AndroidManifest.xml:17:13-43
+59            android:exported="false" >
+59-->[com.google.mlkit:pose-detection-common:17.0.1-beta1] /Users/jin/.gradle/caches/transforms-2/files-2.1/e4524c64123240a3f2bb080e2266256a/pose-detection-common-17.0.1-beta1/AndroidManifest.xml:10:13-37
+60            <meta-data
+60-->[com.google.mlkit:pose-detection-common:17.0.1-beta1] /Users/jin/.gradle/caches/transforms-2/files-2.1/e4524c64123240a3f2bb080e2266256a/pose-detection-common-17.0.1-beta1/AndroidManifest.xml:11:13-13:85
+61                android:name="com.google.firebase.components:com.google.mlkit.vision.pose.internal.PoseRegistrar"
+61-->[com.google.mlkit:pose-detection-common:17.0.1-beta1] /Users/jin/.gradle/caches/transforms-2/files-2.1/e4524c64123240a3f2bb080e2266256a/pose-detection-common-17.0.1-beta1/AndroidManifest.xml:12:17-114
+62                android:value="com.google.firebase.components.ComponentRegistrar" />
+62-->[com.google.mlkit:pose-detection-common:17.0.1-beta1] /Users/jin/.gradle/caches/transforms-2/files-2.1/e4524c64123240a3f2bb080e2266256a/pose-detection-common-17.0.1-beta1/AndroidManifest.xml:13:17-82
+63            <meta-data
+63-->[com.google.mlkit:vision-common:16.2.0] /Users/jin/.gradle/caches/transforms-2/files-2.1/9e7115819aa44ebdff4586622ea8b5ad/vision-common-16.2.0/AndroidManifest.xml:12:13-14:85
+64                android:name="com.google.firebase.components:com.google.mlkit.vision.common.internal.VisionCommonRegistrar"
+64-->[com.google.mlkit:vision-common:16.2.0] /Users/jin/.gradle/caches/transforms-2/files-2.1/9e7115819aa44ebdff4586622ea8b5ad/vision-common-16.2.0/AndroidManifest.xml:13:17-124
+65                android:value="com.google.firebase.components.ComponentRegistrar" />
+65-->[com.google.mlkit:vision-common:16.2.0] /Users/jin/.gradle/caches/transforms-2/files-2.1/9e7115819aa44ebdff4586622ea8b5ad/vision-common-16.2.0/AndroidManifest.xml:14:17-82
+66            <meta-data
+66-->[com.google.mlkit:common:17.1.0] /Users/jin/.gradle/caches/transforms-2/files-2.1/751ae90ff7dddecf4b2394c0b9f9f00d/common-17.1.0/AndroidManifest.xml:20:13-22:85
+67                android:name="com.google.firebase.components:com.google.mlkit.common.internal.CommonComponentRegistrar"
+67-->[com.google.mlkit:common:17.1.0] /Users/jin/.gradle/caches/transforms-2/files-2.1/751ae90ff7dddecf4b2394c0b9f9f00d/common-17.1.0/AndroidManifest.xml:21:17-120
+68                android:value="com.google.firebase.components.ComponentRegistrar" />
+68-->[com.google.mlkit:common:17.1.0] /Users/jin/.gradle/caches/transforms-2/files-2.1/751ae90ff7dddecf4b2394c0b9f9f00d/common-17.1.0/AndroidManifest.xml:22:17-82
+69        </service>
+70
+71        <provider
+71-->[com.google.mlkit:common:17.1.0] /Users/jin/.gradle/caches/transforms-2/files-2.1/751ae90ff7dddecf4b2394c0b9f9f00d/common-17.1.0/AndroidManifest.xml:9:9-13:38
+72            android:name="com.google.mlkit.common.internal.MlKitInitProvider"
+72-->[com.google.mlkit:common:17.1.0] /Users/jin/.gradle/caches/transforms-2/files-2.1/751ae90ff7dddecf4b2394c0b9f9f00d/common-17.1.0/AndroidManifest.xml:10:13-78
+73            android:authorities="com.clj.autographer.mlkitinitprovider"
+73-->[com.google.mlkit:common:17.1.0] /Users/jin/.gradle/caches/transforms-2/files-2.1/751ae90ff7dddecf4b2394c0b9f9f00d/common-17.1.0/AndroidManifest.xml:11:13-69
+74            android:exported="false"
+74-->[com.google.mlkit:common:17.1.0] /Users/jin/.gradle/caches/transforms-2/files-2.1/751ae90ff7dddecf4b2394c0b9f9f00d/common-17.1.0/AndroidManifest.xml:12:13-37
+75            android:initOrder="99" />
+75-->[com.google.mlkit:common:17.1.0] /Users/jin/.gradle/caches/transforms-2/files-2.1/751ae90ff7dddecf4b2394c0b9f9f00d/common-17.1.0/AndroidManifest.xml:13:13-35
+76
+77        <activity
+77-->[com.google.android.gms:play-services-base:17.4.0] /Users/jin/.gradle/caches/transforms-2/files-2.1/fce70cd1b8ec52e360a845c887c7d9e1/play-services-base-17.4.0/AndroidManifest.xml:23:9-26:75
+78            android:name="com.google.android.gms.common.api.GoogleApiActivity"
+78-->[com.google.android.gms:play-services-base:17.4.0] /Users/jin/.gradle/caches/transforms-2/files-2.1/fce70cd1b8ec52e360a845c887c7d9e1/play-services-base-17.4.0/AndroidManifest.xml:24:13-79
+79            android:exported="false"
+79-->[com.google.android.gms:play-services-base:17.4.0] /Users/jin/.gradle/caches/transforms-2/files-2.1/fce70cd1b8ec52e360a845c887c7d9e1/play-services-base-17.4.0/AndroidManifest.xml:25:13-37
+80            android:theme="@android:style/Theme.Translucent.NoTitleBar" />
+80-->[com.google.android.gms:play-services-base:17.4.0] /Users/jin/.gradle/caches/transforms-2/files-2.1/fce70cd1b8ec52e360a845c887c7d9e1/play-services-base-17.4.0/AndroidManifest.xml:26:13-72
+81
+82        <meta-data
+82-->[com.google.android.gms:play-services-basement:17.4.0] /Users/jin/.gradle/caches/transforms-2/files-2.1/151a48a3e4bcd301d3133d32578e09f3/play-services-basement-17.4.0/AndroidManifest.xml:23:9-25:69
+83            android:name="com.google.android.gms.version"
+83-->[com.google.android.gms:play-services-basement:17.4.0] /Users/jin/.gradle/caches/transforms-2/files-2.1/151a48a3e4bcd301d3133d32578e09f3/play-services-basement-17.4.0/AndroidManifest.xml:24:13-58
+84            android:value="@integer/google_play_services_version" />
+84-->[com.google.android.gms:play-services-basement:17.4.0] /Users/jin/.gradle/caches/transforms-2/files-2.1/151a48a3e4bcd301d3133d32578e09f3/play-services-basement-17.4.0/AndroidManifest.xml:25:13-66
+85
+86        <service
+86-->[com.google.android.datatransport:transport-backend-cct:2.3.2] /Users/jin/.gradle/caches/transforms-2/files-2.1/cac7107719c5cdb39c8e532b9e13dab3/transport-backend-cct-2.3.2/AndroidManifest.xml:29:9-35:19
+87            android:name="com.google.android.datatransport.runtime.backends.TransportBackendDiscovery"
+87-->[com.google.android.datatransport:transport-backend-cct:2.3.2] /Users/jin/.gradle/caches/transforms-2/files-2.1/cac7107719c5cdb39c8e532b9e13dab3/transport-backend-cct-2.3.2/AndroidManifest.xml:30:13-103
+88            android:exported="false" >
+88-->[com.google.android.datatransport:transport-backend-cct:2.3.2] /Users/jin/.gradle/caches/transforms-2/files-2.1/cac7107719c5cdb39c8e532b9e13dab3/transport-backend-cct-2.3.2/AndroidManifest.xml:31:13-37
+89            <meta-data
+89-->[com.google.android.datatransport:transport-backend-cct:2.3.2] /Users/jin/.gradle/caches/transforms-2/files-2.1/cac7107719c5cdb39c8e532b9e13dab3/transport-backend-cct-2.3.2/AndroidManifest.xml:32:13-34:39
+90                android:name="backend:com.google.android.datatransport.cct.CctBackendFactory"
+90-->[com.google.android.datatransport:transport-backend-cct:2.3.2] /Users/jin/.gradle/caches/transforms-2/files-2.1/cac7107719c5cdb39c8e532b9e13dab3/transport-backend-cct-2.3.2/AndroidManifest.xml:33:17-94
+91                android:value="cct" />
+91-->[com.google.android.datatransport:transport-backend-cct:2.3.2] /Users/jin/.gradle/caches/transforms-2/files-2.1/cac7107719c5cdb39c8e532b9e13dab3/transport-backend-cct-2.3.2/AndroidManifest.xml:34:17-36
+92        </service>
+93        <service
+93-->[com.google.android.datatransport:transport-runtime:2.2.5] /Users/jin/.gradle/caches/transforms-2/files-2.1/c9d3f3f2efeb1dc2ffb9e9e9b4cb3f72/transport-runtime-2.2.5/AndroidManifest.xml:26:9-30:19
+94            android:name="com.google.android.datatransport.runtime.scheduling.jobscheduling.JobInfoSchedulerService"
+94-->[com.google.android.datatransport:transport-runtime:2.2.5] /Users/jin/.gradle/caches/transforms-2/files-2.1/c9d3f3f2efeb1dc2ffb9e9e9b4cb3f72/transport-runtime-2.2.5/AndroidManifest.xml:27:13-117
+95            android:exported="false"
+95-->[com.google.android.datatransport:transport-runtime:2.2.5] /Users/jin/.gradle/caches/transforms-2/files-2.1/c9d3f3f2efeb1dc2ffb9e9e9b4cb3f72/transport-runtime-2.2.5/AndroidManifest.xml:28:13-37
+96            android:permission="android.permission.BIND_JOB_SERVICE" >
+96-->[com.google.android.datatransport:transport-runtime:2.2.5] /Users/jin/.gradle/caches/transforms-2/files-2.1/c9d3f3f2efeb1dc2ffb9e9e9b4cb3f72/transport-runtime-2.2.5/AndroidManifest.xml:29:13-69
+97        </service>
+98
+99        <receiver
+99-->[com.google.android.datatransport:transport-runtime:2.2.5] /Users/jin/.gradle/caches/transforms-2/files-2.1/c9d3f3f2efeb1dc2ffb9e9e9b4cb3f72/transport-runtime-2.2.5/AndroidManifest.xml:32:9-34:40
+100            android:name="com.google.android.datatransport.runtime.scheduling.jobscheduling.AlarmManagerSchedulerBroadcastReceiver"
+100-->[com.google.android.datatransport:transport-runtime:2.2.5] /Users/jin/.gradle/caches/transforms-2/files-2.1/c9d3f3f2efeb1dc2ffb9e9e9b4cb3f72/transport-runtime-2.2.5/AndroidManifest.xml:33:13-132
+101            android:exported="false" />
+101-->[com.google.android.datatransport:transport-runtime:2.2.5] /Users/jin/.gradle/caches/transforms-2/files-2.1/c9d3f3f2efeb1dc2ffb9e9e9b4cb3f72/transport-runtime-2.2.5/AndroidManifest.xml:34:13-37
+102    </application>
+103
+104</manifest>

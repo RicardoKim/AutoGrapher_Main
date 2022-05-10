@@ -1,0 +1,82 @@
+com/clj/autographer/operation/OperationActivity.java
+ com.clj.autographer.operation.OperationActivity
+ com.clj.autographer.operation.OperationActivity$1
+com/clj/autographer/comm/Observer.java
+ com.clj.autographer.comm.Observer
+com/clj/autographer/comm/ObserverManager.java
+ com.clj.autographer.comm.ObserverManager
+ com.clj.autographer.comm.ObserverManager$ObserverManagerHolder
+com/clj/autographer/operation/ServiceListFragment.java
+ com.clj.autographer.operation.ServiceListFragment
+ com.clj.autographer.operation.ServiceListFragment$1
+ com.clj.autographer.operation.ServiceListFragment$ResultAdapter
+ com.clj.autographer.operation.ServiceListFragment$ResultAdapter$ViewHolder
+com/clj/autographer/camera/CameraMainActivity.java
+ com.clj.autographer.camera.CameraMainActivity
+ com.clj.autographer.camera.CameraMainActivity$1
+ com.clj.autographer.camera.CameraMainActivity$2
+ com.clj.autographer.camera.CameraMainActivity$3
+ com.clj.autographer.camera.CameraMainActivity$4
+ com.clj.autographer.camera.CameraMainActivity$4$1
+ com.clj.autographer.camera.CameraMainActivity$4$2
+ com.clj.autographer.camera.CameraMainActivity$5
+ com.clj.autographer.camera.CameraMainActivity$5$1
+ com.clj.autographer.camera.CameraMainActivity$5$2
+ com.clj.autographer.camera.CameraMainActivity$BackgroundThread
+ com.clj.autographer.camera.CameraMainActivity$BackgroundThread$1
+ com.clj.autographer.camera.CameraMainActivity$BackgroundThread$1$1
+ com.clj.autographer.camera.CameraMainActivity$BackgroundThread$1$2
+com/clj/autographer/camera/Singleton.java
+ com.clj.autographer.camera.Singleton
+com/clj/autographer/BuildConfig.java
+ com.clj.autographer.BuildConfig
+com/clj/autographer/adapter/DeviceAdapter.java
+ com.clj.autographer.adapter.DeviceAdapter
+ com.clj.autographer.adapter.DeviceAdapter$1
+ com.clj.autographer.adapter.DeviceAdapter$2
+ com.clj.autographer.adapter.DeviceAdapter$3
+ com.clj.autographer.adapter.DeviceAdapter$OnDeviceClickListener
+ com.clj.autographer.adapter.DeviceAdapter$ViewHolder
+com/clj/autographer/camera/CameraMainActivity2.java
+ com.clj.autographer.camera.CameraMainActivity2
+com/clj/autographer/comm/Observable.java
+ com.clj.autographer.comm.Observable
+com/clj/autographer/operation/CharacteristicOperationFragment.java
+ com.clj.autographer.operation.CharacteristicOperationFragment
+ com.clj.autographer.operation.CharacteristicOperationFragment$1
+ com.clj.autographer.operation.CharacteristicOperationFragment$1$1
+ com.clj.autographer.operation.CharacteristicOperationFragment$1$1$1
+ com.clj.autographer.operation.CharacteristicOperationFragment$1$1$2
+ com.clj.autographer.operation.CharacteristicOperationFragment$2
+ com.clj.autographer.operation.CharacteristicOperationFragment$2$1
+ com.clj.autographer.operation.CharacteristicOperationFragment$2$1$1
+ com.clj.autographer.operation.CharacteristicOperationFragment$2$1$2
+ com.clj.autographer.operation.CharacteristicOperationFragment$3
+ com.clj.autographer.operation.CharacteristicOperationFragment$3$1
+ com.clj.autographer.operation.CharacteristicOperationFragment$3$1$1
+ com.clj.autographer.operation.CharacteristicOperationFragment$3$1$2
+ com.clj.autographer.operation.CharacteristicOperationFragment$3$1$3
+ com.clj.autographer.operation.CharacteristicOperationFragment$4
+ com.clj.autographer.operation.CharacteristicOperationFragment$4$1
+ com.clj.autographer.operation.CharacteristicOperationFragment$4$1$1
+ com.clj.autographer.operation.CharacteristicOperationFragment$4$1$2
+ com.clj.autographer.operation.CharacteristicOperationFragment$4$1$3
+ com.clj.autographer.operation.CharacteristicOperationFragment$BackgroundThread
+ com.clj.autographer.operation.CharacteristicOperationFragment$BackgroundThread$1
+ com.clj.autographer.operation.CharacteristicOperationFragment$BackgroundThread$1$1
+ com.clj.autographer.operation.CharacteristicOperationFragment$BackgroundThread$1$2
+com/clj/autographer/operation/CharacteristicListFragment.java
+ com.clj.autographer.operation.CharacteristicListFragment
+ com.clj.autographer.operation.CharacteristicListFragment$1
+ com.clj.autographer.operation.CharacteristicListFragment$1$1
+ com.clj.autographer.operation.CharacteristicListFragment$ResultAdapter
+ com.clj.autographer.operation.CharacteristicListFragment$ResultAdapter$ViewHolder
+com/clj/autographer/MainActivity.java
+ com.clj.autographer.MainActivity
+ com.clj.autographer.MainActivity$1
+ com.clj.autographer.MainActivity$2
+ com.clj.autographer.MainActivity$3
+ com.clj.autographer.MainActivity$4
+ com.clj.autographer.MainActivity$5
+ com.clj.autographer.MainActivity$6
+ com.clj.autographer.MainActivity$7
