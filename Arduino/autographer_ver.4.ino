@@ -36,7 +36,7 @@ void setup() {
   Y_Servo.write(Y_initial); // Y축 서보모터의 초기 각을 지정
 
 }
-
+//hello
 void loop() {
   /*
   while(1){
