@@ -14,8 +14,8 @@ Servo Y_Servo;
 
 int servo_X = X_initial;    //x축 각도(pitch)
 int servo_Y = Y_initial;    //y축 각도(roll)
-//int prev_X = servo_X;       //기존 각도 유지를 위한 변수
-//int prev_Y = servo_Y;
+int prev_X = servo_X;       //기존 각도 유지를 위한 변수
+int prev_Y = servo_Y;
 int act = 0;                //처리 순서
 // 전역변수 넣기
 
@@ -57,16 +57,17 @@ void loop() {
         if(Leveling(loop_count)==true){
           break;
         }
-        move_servo(X_Servo,servo_X);//서보 움직이기
-        move_servo(Y_Servo,servo_Y);
-        //prev_X = servo_X;       //기존 각도 유지를 위한 변수
-        //prev_Y = servo_Y;
+        if(prev_X != servo_X){
+          move_servo(X_Servo,servo_X);//서보 움직이기
+        }
+        if(prev_Y != servo_Y){
+          move_servo(Y_Servo,servo_Y);
+        }
+        prev_X = servo_X;       //기존 각도 유지를 위한 변수
+        prev_Y = servo_Y;
         loop_count++;
         
       }
-      
-      
-      //move_servo();
       loop_count=0;
       break;
     case 2:
@@ -117,7 +118,7 @@ bool Leveling(int loopCount){               //초기에 불안정한 값 무시�
   if(loopCount>300){                       //초기에 불안정한 값 무시하고 400회부터 변형
     Serial.println("Leveling Started..."); // 함수 실행시 안내문 출력
     if(tiltX<0){                            //x축이 -로 기울은 경우
-      if(servo_X<180){        
+      if(servo_X<150){        
         servo_X++;            //X 축 서보모터 각도 증가
       }
       //X_Servo.write(servo_X); // x축 서보모터를 새로운 각도로 회전
@@ -126,7 +127,7 @@ bool Leveling(int loopCount){               //초기에 불안정한 값 무시�
       //Serial.println(servo_X);
     }
     if(tiltX>0){            //x축이 +로 기울은 경우
-      if(servo_X>0){      
+      if(servo_X>30){      
         servo_X--;          //x축 서보모터 각도 감소
       }      
       //X_Servo.write(servo_X); // x축 서보모터를 새로운 각도로 회전
@@ -136,7 +137,7 @@ bool Leveling(int loopCount){               //초기에 불안정한 값 무시�
       //Serial.println(servo_X);
     }
     if(tiltY<0){            //y축이 -로 기울은 경우
-      if(servo_Y<180){
+      if(servo_Y<150){
         servo_Y++;          //y축 서보모터 각도 증가
       }
       //Y_Servo.write(servo_Y); // y축 서보모터를 새로운 각도로 회전
@@ -145,7 +146,7 @@ bool Leveling(int loopCount){               //초기에 불안정한 값 무시�
       //Serial.println(servo_Y);
     }
     if(tiltY>0){          //y축이 +로 기울은 경우
-      if(servo_Y>0){
+      if(servo_Y>30){
         servo_Y--;        //y축 서보모터 각도 감소
       }
       //Y_Servo.write(servo_Y); // y축 서보모터를 새로운 각도로 회전
