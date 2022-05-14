@@ -352,7 +352,9 @@ public class CharacteristicOperationFragment extends Fragment {
                                     @RequiresApi(api = Build.VERSION_CODES.N)
                                     @Override
                                     public void run() {
+                                        System.out.println(data);
                                         String command = hexToString(HexUtil.formatHexString(data, false));
+                                        System.out.println(command);
                                         if(command.contains("camera")){
 
                                             Intent intent = new Intent(getActivity(), CameraMainActivity.class);

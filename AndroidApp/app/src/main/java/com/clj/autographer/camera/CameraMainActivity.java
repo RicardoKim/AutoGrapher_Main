@@ -5,6 +5,9 @@ import static java.lang.Math.atan2;
 
 import android.bluetooth.BluetoothGattCharacteristic;
 import android.bluetooth.BluetoothGattService;
+import android.content.ContentResolver;
+import android.content.ContentValues;
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -15,6 +18,7 @@ import android.graphics.PointF;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Environment;
 import android.provider.MediaStore;
 import android.util.Log;
 import android.view.View;
@@ -45,6 +49,7 @@ import com.google.mlkit.vision.pose.PoseLandmark;
 import com.google.mlkit.vision.pose.accurate.AccuratePoseDetectorOptions;
 import com.wonderkiln.camerakit.CameraKitError;
 import com.wonderkiln.camerakit.CameraKitEvent;
+import com.wonderkiln.camerakit.CameraKitEventCallback;
 import com.wonderkiln.camerakit.CameraKitEventListener;
 import com.wonderkiln.camerakit.CameraKitImage;
 import com.wonderkiln.camerakit.CameraKitVideo;
@@ -52,7 +57,12 @@ import com.wonderkiln.camerakit.CameraView;
 
 import org.json.JSONObject;
 
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 
@@ -64,6 +74,7 @@ public class CameraMainActivity  extends AppCompatActivity implements View.OnCli
     BleDevice bleDevice;
     BluetoothGattCharacteristic characteristic;
     BluetoothGattService characteristic_service;
+    String IMAGES_FOLDER_NAME = "Camera";
 
     @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN_MR2)
     @Override
@@ -106,8 +117,8 @@ public class CameraMainActivity  extends AppCompatActivity implements View.OnCli
                 Bitmap bitmap = cameraKitImage.getBitmap();
                 bitmap = Bitmap.createScaledBitmap(bitmap, cameraViewPose.getWidth(), cameraViewPose.getHeight(), false);
                 cameraViewPose.stop();
-
                 runPose(bitmap);
+                progressBar.setVisibility(View.INVISIBLE);
             }
 
             @Override
@@ -132,7 +143,7 @@ public class CameraMainActivity  extends AppCompatActivity implements View.OnCli
         }
     }
 
-    // Galeri Fonksiyonları
+
     final int REQUEST_GALLERY = 1;
     private void galleryAdd() {
         Intent mediaIntent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
@@ -224,6 +235,54 @@ public class CameraMainActivity  extends AppCompatActivity implements View.OnCli
                         });
     }
 
+    private void takephoto(){
+        cameraViewPose.captureImage(
+                new CameraKitEventCallback<CameraKitImage>() {
+                    @Override
+                    public void callback(CameraKitImage cameraKitImage) {
+
+                        Bitmap result = cameraKitImage.getBitmap();
+                        try {
+                            saveImage(result, "카메라");
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }
+        );
+    }
+    private void saveImage(Bitmap bitmap, @NonNull String name) throws IOException {
+        boolean saved;
+        OutputStream fos;
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            ContentResolver resolver = getContentResolver();
+            ContentValues contentValues = new ContentValues();
+            contentValues.put(MediaStore.MediaColumns.DISPLAY_NAME, name);
+            contentValues.put(MediaStore.MediaColumns.MIME_TYPE, "image/png");
+            contentValues.put(MediaStore.MediaColumns.RELATIVE_PATH, "DCIM/Camera");
+            Uri imageUri = resolver.insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, contentValues);
+            fos = resolver.openOutputStream(imageUri);
+        } else {
+            String imagesDir = Environment.getExternalStoragePublicDirectory(
+                    Environment.DIRECTORY_DCIM).toString() + File.separator + IMAGES_FOLDER_NAME;
+
+            File file = new File(imagesDir);
+
+            if (!file.exists()) {
+                file.mkdir();
+            }
+
+            File image = new File(imagesDir, name + ".png");
+            fos = new FileOutputStream(image);
+
+        }
+
+        saved = bitmap.compress(Bitmap.CompressFormat.PNG, 100, fos);
+        fos.flush();
+        fos.close();
+    }
+
     // Pose Detect
     String angleText;
 
@@ -269,38 +328,6 @@ public class CameraMainActivity  extends AppCompatActivity implements View.OnCli
             poseInformation.put("rShoulderY", (int)rShoulderY);
 
 
-            PointF leftElbowP = leftElbow.getPosition();
-            float lElbowX = leftElbowP.x;
-            float lElbowY = leftElbowP.y;
-            PointF rightElbowP = rightElbow.getPosition();
-            float rElbowX = rightElbowP.x;
-            float rElbowY = rightElbowP.y;
-
-
-            PointF leftWristP = leftWrist.getPosition();
-            float lWristX = leftWristP.x;
-            float lWristY = leftWristP.y;
-            PointF rightWristP = rightWrist.getPosition();
-            float rWristX = rightWristP.x;
-            float rWristY = rightWristP.y;
-
-            // Kalça
-            PointF leftHipP = leftHip.getPosition();
-            float lHipX = leftHipP.x;
-            float lHipY = leftHipP.y;
-            PointF rightHipP = rightHip.getPosition();
-            float rHipX = rightHipP.x;
-            float rHipY = rightHipP.y;
-
-            //Diz
-            PointF leftKneeP = leftKnee.getPosition();
-            float lKneeX = leftKneeP.x;
-            float lKneeY = leftKneeP.y;
-            PointF rightKneeP = rightKnee.getPosition();
-            float rKneeX = rightKneeP.x;
-            float rKneeY = rightKneeP.y;
-
-
             PointF leftAnkleP = leftAnkle.getPosition();
             float lAnkleX = leftAnkleP.x;
             float lAnkleY = leftAnkleP.y;
@@ -313,32 +340,9 @@ public class CameraMainActivity  extends AppCompatActivity implements View.OnCli
             poseInformation.put("rAnkleY", (int)rAnkleY);
             sendingDataToHM10(poseInformation);
 
-
-            // Angle Text
-            double leftArmAngle = getAngle(leftShoulder, leftElbow,leftWrist);
-            String leftArmAngleText = String.format("%.2f", leftArmAngle);
-
-            double rightArmAngle = getAngle(rightShoulder, rightElbow,rightWrist);
-            String rightArmAngleText = String.format("%.2f", rightArmAngle);
-
-            double leftLegAngle = getAngle(leftHip, leftKnee, leftAnkle);
-            String leftLegAngleText = String.format("%.2f", leftLegAngle);
-
-            double rightLegAngle = getAngle(rightHip, rightKnee, rightAnkle);
-            String rightLegAngleText = String.format("%.2f", rightLegAngle);
-
-            angleText = "left Arm Angle: "+String.valueOf(rShoulderX)+"\n" +
-                    "right Arm Angle: "+String.valueOf(rShoulderY) + "\n" +
-                    "lefLeg Angle: "+leftLegAngleText + "\n" +
-                    "rightLeg Angle: "+rightLegAngleText;
-
-
-            DisplayAll(lShoulderX, lShoulderY, rShoulderX, rShoulderY,
-                    lElbowX, lElbowY, rElbowX, rElbowY,
-                    lWristX, lWristY, rWristX, rWristY,
-                    lHipX, lHipY, rHipX, rHipY,
-                    lKneeX, lKneeY, rKneeX, rKneeY,
-                    lAnkleX, lAnkleY, rAnkleX,rAnkleY);
+            BackgroundThread thread = new BackgroundThread();
+            thread.start();
+            cameraViewPose.start();
 
 
 
@@ -346,121 +350,6 @@ public class CameraMainActivity  extends AppCompatActivity implements View.OnCli
             Toast.makeText(CameraMainActivity.this, "Pose Estimation Finish",Toast.LENGTH_SHORT).show();
             progressBar.setVisibility(View.INVISIBLE);
         }
-    }
-
-    // Pose Draw
-    private void DisplayAll(float lShoulderX, float lShoulderY, float rShoulderX, float rShoulderY,
-                            float lElbowX, float lElbowY, float rElbowX, float rElbowY,
-                            float lWristX, float lWristY, float rWristX, float rWristY,
-                            float lHipX, float lHipY, float rHipX, float rHipY,
-                            float lKneeX, float lKneeY, float rKneeX, float rKneeY,
-                            float lAnkleX, float lAnkleY, float rAnkleX, float rAnkleY) {
-
-        Paint paint = new Paint();
-        paint.setColor(Color.GREEN);
-        float strokeWidth = 4.0f;
-        paint.setStrokeWidth(strokeWidth);
-
-        Bitmap drawBitmap = Bitmap.createBitmap(resizedBitmap.getWidth(), resizedBitmap.getHeight(), resizedBitmap.getConfig());
-
-        Canvas canvas =new Canvas(drawBitmap);
-
-        canvas.drawBitmap(resizedBitmap, 0f, 0f, null);
-
-        // Sol Omuzdan Sağ Omuza
-        canvas.drawLine(lShoulderX, lShoulderY, rShoulderX, rShoulderY, paint);
-
-        // Sağ Omuzdan Sağ Dirseğe
-        canvas.drawLine(rShoulderX, rShoulderY, rElbowX, rElbowY, paint);
-
-        //Sağ Dirsekten Sağ El Bileğine
-        canvas.drawLine(rElbowX, rElbowY, rWristX, rWristY, paint);
-
-        // Sol Omuzdan Sol Dirseğe
-        canvas.drawLine(lShoulderX, lShoulderY, lElbowX, lElbowY, paint);
-
-        // Sol Dirsekten Sol El Bileğine
-        canvas.drawLine(lElbowX, lElbowY, lWristX, lWristY, paint);
-
-        //Sağ Omuzdan Sağ Kalçaya
-        canvas.drawLine(rShoulderX, rShoulderY, rHipX, rHipY, paint);
-
-        // Sol Omuzdan Sol Kalçaya
-        canvas.drawLine(lShoulderX, lShoulderY, lHipX, lHipY, paint);
-
-        // Kalça (Bel)
-        canvas.drawLine(lHipX, lHipY, rHipX, rHipY, paint);
-
-        // Sağ Kalçadan Sağ Ayak Dizine
-        canvas.drawLine(rHipX, rHipY, rKneeX, rKneeY, paint);
-
-        // Sol Kalçadan Sol Ayak Dizine
-        canvas.drawLine(lHipX, lHipY, lKneeX, lKneeY, paint);
-
-        // Sağ Ayak Dizinden Sağ Ayak Bileğine
-        canvas.drawLine(rKneeX, rKneeY, rAnkleX, rAnkleY, paint);
-
-        // Sol Ayak Dizinden Sol Ayak Bileğine
-        canvas.drawLine(lKneeX, lKneeY, lAnkleX, lAnkleY, paint);
-
-        // MainActivity to MainActivity2
-        Intent intent = new Intent(CameraMainActivity.this, CameraMainActivity2.class);
-        intent.putExtra("Text", angleText);
-
-        Singleton singleton = Singleton.getInstance();
-        singleton.setMyImage(drawBitmap);
-
-        startActivity(intent);
-
-    }
-
-    // Angle Detect
-    static double getAngle(PoseLandmark firstPoint, PoseLandmark midPoint, PoseLandmark lastPoint) {
-        double result =
-                Math.toDegrees(
-                        atan2(lastPoint.getPosition().y - midPoint.getPosition().y,
-                                lastPoint.getPosition().x - midPoint.getPosition().x)
-                                - atan2(firstPoint.getPosition().y - midPoint.getPosition().y,
-                                firstPoint.getPosition().x - midPoint.getPosition().x));
-        result = Math.abs(result); // Angle should never be negative
-        if (result > 180) {
-            result = (360.0 - result); // Always get the acute representation of the angle
-        }
-        return result;
-    }
-
-    @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN_MR2)
-    private void sendingDataToHM10(float sendingValue){
-        List<BluetoothGattCharacteristic> characteristicList = BleManager.getInstance().getBluetoothGattCharacteristics(characteristic_service);
-        BluetoothGattCharacteristic bluetoothGattCharacteristic = characteristicList.get(0);
-        byte[] leftShoulderByte = floatToByteArray(sendingValue);
-        BleManager.getInstance().write(
-                bleDevice,
-                bluetoothGattCharacteristic.getService().getUuid().toString(),
-                bluetoothGattCharacteristic.getUuid().toString(),
-                leftShoulderByte,
-                new BleWriteCallback() {
-
-                    @Override
-                    public void onWriteSuccess(final int current, final int total, final byte[] justWrite) {
-                        runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-
-                            }
-                        });
-                    }
-
-                    @Override
-                    public void onWriteFailure(final BleException exception) {
-                        runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                System.out.println(exception.toString());
-                            }
-                        });
-                    }
-                });
     }
 
     @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN_MR2)
@@ -500,12 +389,6 @@ public class CameraMainActivity  extends AppCompatActivity implements View.OnCli
                 });
     }
 
-    private byte[] floatToByteArray(float value){
-        String body = String.valueOf(value) + "\n";
-        byte[] byteArrayForPlain = body.getBytes();
-
-        return byteArrayForPlain;
-    }
 
     @RequiresApi(api = Build.VERSION_CODES.KITKAT)
     private byte[] JSONToByteArray(JSONObject poseInformation){
@@ -521,7 +404,7 @@ public class CameraMainActivity  extends AppCompatActivity implements View.OnCli
         public void run() {
             running = true;
             List<BluetoothGattCharacteristic> characteristicList = BleManager.getInstance().getBluetoothGattCharacteristics(characteristic_service);
-            BluetoothGattCharacteristic bluetoothGattCharacteristic = characteristicList.get(0);
+            final BluetoothGattCharacteristic bluetoothGattCharacteristic = characteristicList.get(0);
             while(running) {
                 BleManager.getInstance().read(
                         bleDevice,
@@ -537,7 +420,9 @@ public class CameraMainActivity  extends AppCompatActivity implements View.OnCli
                                         System.out.println(command);
                                         if(command.contains("photo")){
                                             poseDetect();
-                                            running = false;
+                                        }
+                                        else if(command.contains("takephoto")){
+                                            takephoto();
                                         }
                                     }
                                 });
