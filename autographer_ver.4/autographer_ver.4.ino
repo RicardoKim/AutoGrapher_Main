@@ -12,10 +12,11 @@ MPU9250 mpu; // mpu라는 이름으로 MPU9250 설정
 Servo X_Servo;
 Servo Y_Servo;
 
-bool leveling_sign = false;
-int servo_X = X_initial;
-int servo_Y = Y_initial;
-int act = 0;
+int servo_X = X_initial;    //x축 각도(pitch)
+int servo_Y = Y_initial;    //y축 각도(roll)
+//int prev_X = servo_X;       //기존 각도 유지를 위한 변수
+//int prev_Y = servo_Y;
+int act = 0;                //처리 순서
 // 전역변수 넣기
 
 void setup() {
@@ -36,7 +37,7 @@ void setup() {
   Y_Servo.write(Y_initial); // Y축 서보모터의 초기 각을 지정
 
 }
-//hello
+
 void loop() {
   /*
   while(1){
@@ -48,17 +49,25 @@ void loop() {
   }
   */
   act++;              //모드 변경 
-  int i = 0;          //루프 횟수 생각
+  int loop_count = 0;          //루프 횟수 생각
   switch(act){
     case 1:           //레벨링
       while(1){
-        Leveling(i);
-        if(Leveling(i)==true){
+        Leveling(loop_count);
+        if(Leveling(loop_count)==true){
           break;
         }
-        i++;
+        move_servo(X_Servo,servo_X);//서보 움직이기
+        move_servo(Y_Servo,servo_Y);
+        //prev_X = servo_X;       //기존 각도 유지를 위한 변수
+        //prev_Y = servo_Y;
+        loop_count++;
+        
       }
-      i=0;
+      
+      
+      //move_servo();
+      loop_count=0;
       break;
     case 2:
       //get_frame(); // 구도에 사람 넣는 함수
@@ -87,9 +96,7 @@ void print_roll_pitch_yaw() {
     Serial.println(mpu.getRoll(), 2);
 }
 
-
 bool Leveling(int loopCount){               //초기에 불안정한 값 무시하기 위해 루프 횟수 입력
-  
   
   int tiltX, tiltY;
   
@@ -101,47 +108,47 @@ bool Leveling(int loopCount){               //초기에 불안정한 값 무시�
   
   tiltX = int(mpu.getPitch()); //계산된 현재 각도
   tiltY = int(mpu.getRoll()); //계산된 현재 각도
+  
   Serial.println(tiltX);
   Serial.println(tiltY);
   if(abs(tiltX)>90||abs(tiltY)>90){
     return false;
   }
-  if(loopCount>400){                       //초기에 불안정한 값 무시하고 400회부터 변형
+  if(loopCount>300){                       //초기에 불안정한 값 무시하고 400회부터 변형
     Serial.println("Leveling Started..."); // 함수 실행시 안내문 출력
     if(tiltX<0){                            //x축이 -로 기울은 경우
-      if(servo_X<90){        
+      if(servo_X<180){        
         servo_X++;            //X 축 서보모터 각도 증가
       }
-      X_Servo.write(servo_X); // x축 서보모터를 새로운 각도로 회전
-      delay(10);
+      //X_Servo.write(servo_X); // x축 서보모터를 새로운 각도로 회전
       Serial.print("Pitch is :");
       Serial.println(tiltX); // 지금 x축 돌린 각도가 몇인지 출력
       //Serial.println(servo_X);
     }
     if(tiltX>0){            //x축이 +로 기울은 경우
-      if(servo_X>-90){      
+      if(servo_X>0){      
         servo_X--;          //x축 서보모터 각도 감소
       }      
-      X_Servo.write(servo_X); // x축 서보모터를 새로운 각도로 회전
-      delay(10);
+      //X_Servo.write(servo_X); // x축 서보모터를 새로운 각도로 회전
+      
       Serial.print("Pitch is :");
       Serial.println(tiltX); // 지금 x축 돌린 각도가 몇인지 출력
       //Serial.println(servo_X);
     }
     if(tiltY<0){            //y축이 -로 기울은 경우
-      if(servo_Y<90){
+      if(servo_Y<180){
         servo_Y++;          //y축 서보모터 각도 증가
       }
-      Y_Servo.write(servo_Y); // y축 서보모터를 새로운 각도로 회전
+      //Y_Servo.write(servo_Y); // y축 서보모터를 새로운 각도로 회전
       Serial.print("Roll is :");
       Serial.println(tiltY); // 지금 y축 돌린 각도가 몇인지 출력
       //Serial.println(servo_Y);
     }
     if(tiltY>0){          //y축이 +로 기울은 경우
-      if(servo_Y>-90){
+      if(servo_Y>0){
         servo_Y--;        //y축 서보모터 각도 감소
       }
-      Y_Servo.write(servo_Y); // y축 서보모터를 새로운 각도로 회전
+      //Y_Servo.write(servo_Y); // y축 서보모터를 새로운 각도로 회전
       Serial.print("Roll is :");
       Serial.println(tiltY); // 지금 y축 돌린 각도가 몇인지 출력
       //Serial.println(servo_Y);
@@ -151,4 +158,12 @@ bool Leveling(int loopCount){               //초기에 불안정한 값 무시�
     }    
   }
   return false;                 //수평이 아닌 경우 false 반환
+}
+
+int move_servo(Servo servo_motor, int ang){       //서보 돌리는 코드
+  int delay_rate = 20;              //속도조절을 위한 딜레이 시간 높을 수록 느리게
+  servo_motor.write(ang);           //서보 움직임
+  delay(delay_rate);                
+  Serial.println("Done rotate");
+  
 }
