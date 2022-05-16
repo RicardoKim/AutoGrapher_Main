@@ -3,7 +3,7 @@
 #include "MPU9250.h"
 //https://github.com/hideakitai/MPU9250 에서 zip 파일로 추가
 MPU9250 mpu; // mpu라는 이름으로 MPU9250 설정
-
+//hh
 #define X_SERVO_PIN 9 // x축 서보모터를 9번핀에 연결
 #define Y_SERVO_PIN 10 // y축 서보모터를 10번핀에 연결
 #define X_initial 90 // x축 서보모터의 초기 각도를 90으로 지정
