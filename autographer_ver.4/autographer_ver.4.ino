@@ -3,19 +3,31 @@
 #include "MPU9250.h"
 //https://github.com/hideakitai/MPU9250 에서 zip 파일로 추가
 MPU9250 mpu; // mpu라는 이름으로 MPU9250 설정
-//hh
+
 #define X_SERVO_PIN 9 // x축 서보모터를 9번핀에 연결
 #define Y_SERVO_PIN 10 // y축 서보모터를 10번핀에 연결
+#define rightLeft_servo_pin 11 // z축 회전 서보모터의 핀
+#define upDown_servo_pin 12 // y축 회전 서보모터의 핀
+
 #define X_initial 90 // x축 서보모터의 초기 각도를 90으로 지정
 #define Y_initial 90 // y축 서보모터의 초기 각도를 90으로 지정
+#define rightLeft_initial 90  // z축 회전 서보모터의 초기각도
+#define upDown_initial 90  // y축 회전 서보모터의 초기각도
 
 Servo X_Servo;
 Servo Y_Servo;
+Servo rightLeft_Servo;
+Servo upDown_Servo;
 
 int servo_X = X_initial;    //x축 각도(pitch)
 int servo_Y = Y_initial;    //y축 각도(roll)
 int prev_X = servo_X;       //기존 각도 유지를 위한 변수
 int prev_Y = servo_Y;
+int servo_rightLeft = rightLeft_initial; // z축 회전 서보모터의 초기각도
+int servo_upDown = upDown_initial; // y축 회전 서보모터의 초기각도
+int movement_data; // 시리얼로부터 받아올 움직일 방향 데이터
+int movement;      // null 값 무시를 위한 명령변수  
+
 int act = 0;                //처리 순서
 // 전역변수 넣기
 
@@ -33,8 +45,13 @@ void setup() {
   }
   X_Servo.attach(X_SERVO_PIN); // X축 서보모터의 핀을 지정
   Y_Servo.attach(Y_SERVO_PIN); // Y축 서보모터의 핀을 지정
+  rightLeft_Servo.attach(rightLeft_servo_pin); // z축 회전 서보모터 핀 연결
+  upDown_Servo.attach(upDown_servo_pin); // 상하 조정용 y축 회전 서보모터 핀 연결
   X_Servo.write(X_initial); // X축 서보모터의 초기 각을 지정
   Y_Servo.write(Y_initial); // Y축 서보모터의 초기 각을 지정
+  rightLeft_Servo.write(rightLeft_initial); // Z축 서보모터의 초기 각을 지정
+  upDown_Servo.write(upDown_initial); // 상하 조정용 Y축 서보모터의 초기 각을 지정
+
 
 }
 
@@ -69,10 +86,18 @@ void loop() {
         
       }
       loop_count=0;
+      delay(1000);
       break;
     case 2:
       //get_frame(); // 구도에 사람 넣는 함수
       Serial.println("FrameWork");
+      while(1){
+        find_person();
+        if(find_person() == true){
+          Serial.println("target found");
+          break;
+        }
+      }
       delay(1000);
       break;
     case 3:
@@ -96,7 +121,7 @@ void print_roll_pitch_yaw() {
     Serial.print(", ");
     Serial.println(mpu.getRoll(), 2);
 }
-
+//수평 맞추는 움직임
 bool Leveling(int loopCount){               //초기에 불안정한 값 무시하기 위해 루프 횟수 입력
   
   int tiltX, tiltY;
@@ -167,4 +192,80 @@ int move_servo(Servo servo_motor, int ang){       //서보 돌리는 코드
   delay(delay_rate);                
   Serial.println("Done rotate");
   
+}
+//구도 맞추는 움직임
+bool Move_Right(){ // z축 회전 서보모터가 오른쪽으로 회전하는 함수
+  if(servo_rightLeft<180){ // 오른쪽으로 끝까지 회전할때까지
+    rightLeft_Servo.write(servo_rightLeft+1); // 1도씩 움직임
+    delay(10); // 지연시간 10ms
+    servo_rightLeft++; // 현재 모터 각도 1도씩 증가
+  }
+  if(servo_rightLeft == 180){ // 오른쪽으로 끝까지 가면
+    return true; // true반환
+  }
+  return false; // 오른쪽으로 끝까지 안간경우 false 반환 
+}
+
+bool Move_Left(){ // 이하 동일
+  if(servo_rightLeft>0){
+    rightLeft_Servo.write(servo_rightLeft-1);
+    delay(10);
+    servo_rightLeft--;
+  }
+  if(servo_rightLeft == 0){
+    return true;
+  }
+  return false;
+}
+
+bool Move_Up(){
+  if(servo_upDown<180){
+    upDown_Servo.write(servo_upDown+1);
+    delay(10);
+    servo_upDown++;
+  }
+  if(servo_upDown == 180){
+    return true;
+  }
+  return false;
+}
+
+bool Move_Down(){
+  if(servo_upDown>0){
+    upDown_Servo.write(servo_upDown-1);
+    delay(10);
+    servo_upDown--;
+  }
+  if(servo_upDown == 0){
+    return true;
+  }
+  return false;
+}
+//구도 맞추는
+bool find_person(){
+  if(Serial.available()>0){ // 시리얼에 입력되었을 때
+    movement_data = Serial.parseInt(); // 그 숫자를 읽어와서 data로 지정함
+    if(movement_data != 0){
+      movement = movement_data;
+    }
+  } 
+  switch(movement){ // movement_data는 1,2,3,4
+    case 1: // 1번의 경우 z축 회전 서보모터가 오른쪽으로 회전
+    Move_Right(); // z축 회전 서보모터가 오른쪽으로 회전하는 함수
+    break;
+    case 2: // 2번의 경우 z축 회전 서보모터가 왼쪽으로 회전
+    Move_Left(); // z축 회전 서보모터가 왼쪽으로 회전하는 함수
+    break;
+    case 3: // 3번의 경우 y축 회전 서보모터가 위쪽으로 회전
+    Move_Up(); // y축 회전 서보모터가 위쪽으로 회전하는 함수 
+    break;
+    case 4: // 4번의 경우 y축 회전 서보모터가 아래쪽으로 회전
+    Move_Down(); // y축 회전 서보모터가 아래쪽으로 회전하는 함수
+    break;
+    case 5:
+    return true;
+  }
+  Serial.println(movement_data);
+  return false;
+
 }
