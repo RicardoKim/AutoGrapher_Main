@@ -328,7 +328,7 @@ public class CharacteristicOperationFragment extends Fragment {
             int lastDigit = Character.digit(hexData[count + 1], 16);
             int decimal = firstDigit * 16 + lastDigit;
             sb.append((char) decimal);
-        }/* www  .j  av a  2 s .c  o m*/
+        }
         return sb.toString();
     }
 
@@ -345,25 +345,27 @@ public class CharacteristicOperationFragment extends Fragment {
                         characteristic.getService().getUuid().toString(),
                         characteristic.getUuid().toString(),
                         new BleReadCallback() {
-
                             @Override
                             public void onReadSuccess(final byte[] data) {
                                 runOnUiThread(new Runnable() {
                                     @RequiresApi(api = Build.VERSION_CODES.N)
                                     @Override
                                     public void run() {
-                                        System.out.println(data);
-                                        String command = hexToString(HexUtil.formatHexString(data, false));
-                                        System.out.println(command);
-                                        if(command.contains("camera")){
 
-                                            Intent intent = new Intent(getActivity(), CameraMainActivity.class);
-                                            intent.putExtra("bleDevice", bleDevice);
-                                            intent.putExtra("characteristic", characteristic);
-                                            intent.putExtra("characteristic_service", characteristic.getService());
-                                            intent.putExtra("uuid",characteristic.getUuid().toString());
-                                            startActivity(intent);
-                                            running = false;
+                                        try{
+                                            String command = hexToString(HexUtil.formatHexString(data, false));
+                                            if(command.contains("1")){
+
+                                                Intent intent = new Intent(getActivity(), CameraMainActivity.class);
+                                                intent.putExtra("bleDevice", bleDevice);
+                                                intent.putExtra("characteristic", characteristic);
+                                                intent.putExtra("characteristic_service", characteristic.getService());
+                                                intent.putExtra("uuid",characteristic.getUuid().toString());
+                                                startActivity(intent);
+                                                running = false;
+                                            }
+                                        }catch(Exception e){
+                                            System.out.println(e.toString());
                                         }
                                     }
                                 });

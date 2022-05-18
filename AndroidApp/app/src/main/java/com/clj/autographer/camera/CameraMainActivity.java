@@ -1,19 +1,17 @@
 package com.clj.autographer.camera;
 
 import static com.clj.autographer.operation.CharacteristicOperationFragment.hexToString;
-import static java.lang.Math.atan2;
 
+import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothGattCharacteristic;
+import android.bluetooth.BluetoothGattServer;
 import android.bluetooth.BluetoothGattService;
+import android.bluetooth.BluetoothSocket;
 import android.content.ContentResolver;
 import android.content.ContentValues;
-import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.Canvas;
-import android.graphics.Color;
-import android.graphics.Paint;
 import android.graphics.PointF;
 import android.net.Uri;
 import android.os.Build;
@@ -33,6 +31,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.clj.autographer.R;
 import com.clj.fastble.BleManager;
+import com.clj.fastble.bluetooth.BleBluetooth;
 import com.clj.fastble.callback.BleReadCallback;
 import com.clj.fastble.callback.BleWriteCallback;
 import com.clj.fastble.data.BleDevice;
@@ -63,6 +62,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.net.Socket;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 
@@ -75,6 +75,7 @@ public class CameraMainActivity  extends AppCompatActivity implements View.OnCli
     BluetoothGattCharacteristic characteristic;
     BluetoothGattService characteristic_service;
     String IMAGES_FOLDER_NAME = "Camera";
+    private InputStream inputStream;
 
     @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN_MR2)
     @Override
@@ -128,6 +129,7 @@ public class CameraMainActivity  extends AppCompatActivity implements View.OnCli
         });
         BackgroundThread thread = new BackgroundThread();
         thread.start();
+
     }
 
     // OnClick
@@ -244,8 +246,10 @@ public class CameraMainActivity  extends AppCompatActivity implements View.OnCli
                         Bitmap result = cameraKitImage.getBitmap();
                         try {
                             saveImage(result, "카메라");
+                            cameraViewPose.start();
                         } catch (IOException e) {
                             e.printStackTrace();
+                            cameraViewPose.start();
                         }
                     }
                 }
@@ -289,7 +293,6 @@ public class CameraMainActivity  extends AppCompatActivity implements View.OnCli
     @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN_MR2)
     private void processPose(Pose pose) {
         try {
-            JSONObject poseInformation = new JSONObject();
             PoseLandmark leftShoulder = pose.getPoseLandmark(PoseLandmark.LEFT_SHOULDER);
             PoseLandmark rightShoulder = pose.getPoseLandmark(PoseLandmark.RIGHT_SHOULDER);
 
@@ -314,34 +317,28 @@ public class CameraMainActivity  extends AppCompatActivity implements View.OnCli
             PoseLandmark rightAnkle = pose.getPoseLandmark(PoseLandmark.RIGHT_ANKLE);
 
             PointF leftShoulderP = leftShoulder.getPosition();
-            float lShoulderX = leftShoulderP.x;
-            poseInformation.put("lShoulderX", (int)lShoulderX);
+            int lShoulderX = (int) leftShoulderP.x;
 
-            float lShoulderY = leftShoulderP.y;
-            poseInformation.put("lShoulderY", (int)lShoulderY);
+
+            int lShoulderY = (int) leftShoulderP.y;
+
 
             PointF rightSoulderP = rightShoulder.getPosition();
 
-            float rShoulderX = rightSoulderP.x;
-            poseInformation.put("rShoulderX", (int)rShoulderX);
-            float rShoulderY = rightSoulderP.y;
-            poseInformation.put("rShoulderY", (int)rShoulderY);
+            int rShoulderX = (int)rightSoulderP.x;
 
+            int rShoulderY = (int)rightSoulderP.y;
 
             PointF leftAnkleP = leftAnkle.getPosition();
-            float lAnkleX = leftAnkleP.x;
-            float lAnkleY = leftAnkleP.y;
+            int lAnkleX = (int) leftAnkleP.x;
+            int lAnkleY = (int) leftAnkleP.y;
             PointF rightAnkleP = rightAnkle.getPosition();
-            float rAnkleX = rightAnkleP.x;
-            float rAnkleY = rightAnkleP.y;
-            poseInformation.put("lAnkleX", (int)lAnkleX);
-            poseInformation.put("lAnkleY", (int)lAnkleY);
-            poseInformation.put("rAnkleX", (int)rAnkleX);
-            poseInformation.put("rAnkleY", (int)rAnkleY);
-            sendingDataToHM10(poseInformation);
+            int rAnkleX = (int) rightAnkleP.x;
+            int rAnkleY = (int) rightAnkleP.y;
 
-            BackgroundThread thread = new BackgroundThread();
-            thread.start();
+            String data = lShoulderX + "," + lShoulderY +"," + rShoulderX +"," + rShoulderY +"," + lAnkleX +"," + lAnkleY +"," + rAnkleX +"," + rAnkleY;
+
+            sendingDataToHM10(data);
             cameraViewPose.start();
 
 
@@ -349,17 +346,15 @@ public class CameraMainActivity  extends AppCompatActivity implements View.OnCli
         }catch (Exception e){
             Toast.makeText(CameraMainActivity.this, "Pose Estimation Finish",Toast.LENGTH_SHORT).show();
             progressBar.setVisibility(View.INVISIBLE);
+            cameraViewPose.start();
         }
     }
 
     @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN_MR2)
-    private void sendingDataToHM10(JSONObject sendingValue){
+    private void sendingDataToHM10(String sendingValue){
         List<BluetoothGattCharacteristic> characteristicList = BleManager.getInstance().getBluetoothGattCharacteristics(characteristic_service);
         BluetoothGattCharacteristic bluetoothGattCharacteristic = characteristicList.get(0);
-        byte[] jsonByte = new byte[0];
-        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.KITKAT) {
-            jsonByte = JSONToByteArray(sendingValue);
-        }
+        byte[] jsonByte = sendingValue.getBytes();
         BleManager.getInstance().write(
                 bleDevice,
                 bluetoothGattCharacteristic.getService().getUuid().toString(),
@@ -398,14 +393,12 @@ public class CameraMainActivity  extends AppCompatActivity implements View.OnCli
 
     class BackgroundThread extends Thread {
         boolean running = false;
-
-
         @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN_MR2)
         public void run() {
             running = true;
-            List<BluetoothGattCharacteristic> characteristicList = BleManager.getInstance().getBluetoothGattCharacteristics(characteristic_service);
-            final BluetoothGattCharacteristic bluetoothGattCharacteristic = characteristicList.get(0);
             while(running) {
+                List<BluetoothGattCharacteristic> characteristicList = BleManager.getInstance().getBluetoothGattCharacteristics(characteristic_service);
+                final BluetoothGattCharacteristic bluetoothGattCharacteristic = characteristicList.get(0);
                 BleManager.getInstance().read(
                         bleDevice,
                         bluetoothGattCharacteristic.getService().getUuid().toString(),
@@ -417,14 +410,21 @@ public class CameraMainActivity  extends AppCompatActivity implements View.OnCli
                                     @Override
                                     public void run() {
                                         String command = hexToString(HexUtil.formatHexString(data, false));
-                                        System.out.println(command);
-                                        if(command.contains("photo")){
-                                            poseDetect();
+
+                                        try{
+                                            if(command == " 2" || Integer.parseInt(command) == 2){
+                                                poseDetect();
+                                            }
+                                            else if(command == " 3" || Integer.parseInt(command) == 3){
+                                                takephoto();
+                                            }
+                                            System.gc();
+                                        }catch(Exception e){
+                                            System.out.println(e.toString());
                                         }
-                                        else if(command.contains("takephoto")){
-                                            takephoto();
-                                        }
+
                                     }
+
                                 });
                             }
 
@@ -439,10 +439,12 @@ public class CameraMainActivity  extends AppCompatActivity implements View.OnCli
 
 
                         });
-
-                try {
+                try{
                     Thread.sleep(1000);
-                } catch (Exception e) {}
+                }catch(Exception e){
+
+                }
+
             }
         }
     }
