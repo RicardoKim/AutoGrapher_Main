@@ -31,12 +31,13 @@ int prev_Y = servo_Y;
 int servo_rightLeft = rightLeft_initial; // z축 회전 서보모터의 초기각도
 int servo_upDown = upDown_initial; // y축 회전 서보모터의 초기각도
 
-int movement_data; // 시리얼로부터 받아올 움직일 방향 데이터
-int movement;      // null 값 무시를 위한 명령변수  
+//???????????????????????????????????????
+//int movement_data; // 시리얼로부터 받아올 움직일 방향 데이터
+//int movement;      // null 값 무시를 위한 명령변수  
+//
+//int* info1 = (int*) malloc(8 * sizeof(int)); // 좌표 저장용 배열 1
+//int* info2 = (int*) malloc(8 * sizeof(int)); // 좌표 저장용 배열 2
 
-int* info1 = (int*) malloc(8 * sizeof(int)); // 좌표 저장용 배열 1
-int* info2 = (int*) malloc(8 * sizeof(int)); // 좌표 저장용 배열 2
-int* final_info = (int*) malloc(2*sizeof(int));
 int act = 0;                //처리 순서
 // 전역변수 넣기
 
@@ -232,98 +233,73 @@ int move_servo(Servo servo_motor,int servo_pin, int ang){       //서보 돌리�
 
 
 
-int* current_position = (int*) malloc(2*sizeof(int));   //초기 좌표 평균
-int* check_angle = (int*) malloc(2*sizeof(int));        //상 10도 좌10도 회전시 좌표 평균
-int* angle_difference = (int*) malloc(2*sizeof(int));  //10도 회전 시 구도 변화 측정
 
+//만약 0이 나오면 어차피 안 나온 것이다 
+// 앱과의 통신을 통해 레퍼런스 좌표 두 개 받아오는 함수
 //좌표 받는 코드
-int *get_position(){
+int* get_position(){
+  int* pos = (int*) malloc(2*sizeof(int));
   int check_pos = 0;
   for(int i=0;i<8;i++){    
     check_pos = SerialtoBTC.parseInt();     //좌표 받기
     if(check_pos == 0){
-      return 0;
+      pos[0] = 0;
+      pos[1] = 0;
+      return pos;
     }
     if(i%2 == 0){
-      current_position[0]+=check_pos;
+      pos[0]+=check_pos;
     }
     if(i%2 == 1){
-      current_position[1]+=check_pos;
+      pos[1]+=check_pos;
     }
-    current_position[0] = current_position[0]/4;
-    current_position[1] = current_position[1]/4;
+    pos[0] = pos[0]/4;
+    pos[1] = pos[1]/4;
   }
+  return pos;
 }
 
-bool find_person(){
-  if(Serial.available()>0){ // 시리얼에 입력되었을 때
-    movement_data = Serial.parseInt(); // 그 숫자를 읽어와서 data로 지정함
-    if(movement_data != 0){
-      movement = movement_data;
-    }
-  } 
-//  switch(movement){ // movement_data는 1,2,3,4
-//    case 1: // 1번의 경우 z축 회전 서보모터가 오른쪽으로 회전
-//    Move_Right(); // z축 회전 서보모터가 오른쪽으로 회전하는 함수
-//    break;
-//    case 2: // 2번의 경우 z축 회전 서보모터가 왼쪽으로 회전
-//    Move_Left(); // z축 회전 서보모터가 왼쪽으로 회전하는 함수
-//    break;
-//    case 3: // 3번의 경우 y축 회전 서보모터가 위쪽으로 회전
-//    Move_Up(); // y축 회전 서보모터가 위쪽으로 회전하는 함수 
-//    break;
-//    case 4: // 4번의 경우 y축 회전 서보모터가 아래쪽으로 회전
-//    Move_Down(); // y축 회전 서보모터가 아래쪽으로 회전하는 함수
-//    break;
-//    case 5:
-//    return true;
-//  }
-  Serial.println(movement_data);
+bool find_person(int* difference){
+  
+
+
+
+
+
+
+  
   return false;
 
 }
-
-
-//만약 0이 나오면 어차피 안 나온 것이다 
-// 앱과의 통신을 통해 레퍼런스 좌표 두 개 받아오는 함수
-//int *get_frame(){
-//  int check_pos = 0;
-//  SerialtoBTC.write(2); // 블루투스 통신을 통해 앱에게 사진 찍으라고 시킴
-//  for(int i=0;i<8;i++){    
-//    check_pos = SerialtoBTC.parseInt();       //좌표 받기
-//    if(check_pos == 0){
-//      return 0;
-//    }
-//    if(i%2 == 0){
-//      current_position[0]+=check_pos;
-//    }
-//    if(i%2 == 1){
-//      current_position[1]+=check_pos;
-//    }
-//    current_position[0] = current_position[0]/4;
-//    current_position[1] = current_position[1]/4;
-//  }
-//  
-//  move_servo(rightLeft_Servo,rightLeft_servo_pin,servo_rightLeft+10); //도.................리
-//  move_servo(upDown_Servo,upDown_servo_pin,servo_upDown+10);          //끄.................덕
-//  
-//  SerialtoBTC.write(2); // 블루투스 통신을 통해 앱에게 사진 찍으라고 시킴
-//  
-//  for(int i=0;i<8;i++){
-//    check_pos = SerialtoBTC.parseInt();   //좌표 받기
-//    if(check_pos == 0){
-//      return 0;
-//    }
-//    if(i%2 == 0){
-//      check_angle[0]+=check_pos;
-//    }
-//    if(i%2 == 1){
-//      check_angle[1]+=check_pos;
-//    }
-//    check_angle[0] = check_angle[0]/4;
-//    check_angle[1] = check_angle[1]/4;
-//  }
-//  find_person();
-//}
+//int a[8] 쓰지 않는 이유는?
+int* current_position = (int*) malloc(2*sizeof(int));   //초기 좌표 평균
+int* check_angle = (int*) malloc(2*sizeof(int));        //상 10도 좌10도 회전시 좌표 평균
+int* angle_difference = (int*) malloc(2*sizeof(int));  //10도 회전 시 구도 변화 측정
+//쓰고 나면 malloc은 해제 해줘야하지 않나?
 
 //구도 맞추는
+int get_frame(){
+  int* angle_difference = (int*) malloc(2*sizeof(int));  //10도 회전 시 구도 변화 측정
+  
+  SerialtoBTC.write(2); // 블루투스 통신을 통해 앱에게 사진 찍으라고 시킴
+  current_position = get_position();    //현재 중앙 좌표
+  if(current_position[0]==0){
+    return 0;
+  }
+  
+  move_servo(rightLeft_Servo,rightLeft_servo_pin,servo_rightLeft+10); //도.................리
+  move_servo(upDown_Servo,upDown_servo_pin,servo_upDown+10);          //끄.................덕
+  
+  SerialtoBTC.write(2); // 블루투스 통신을 통해 앱에게 사진 찍으라고 시킴
+  check_angle = get_position();         //기준치 변경시 구도 확인
+  if(check_angle[0]==0){
+    return 0;
+  }
+  angle_difference[0] = check_angle[0]-current_position[0];       //10도마다 생기는 차이
+  angle_difference[1] = check_angle[1]-current_position[1];
+  
+  find_person(angle_difference);
+  
+  return 1;
+  
+}
