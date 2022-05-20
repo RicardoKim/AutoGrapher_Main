@@ -8,6 +8,7 @@
 // 블루투스컨트롤러 -> 리모컨 코드는 추가하여 합쳐야 함
 
 #include <SoftwareSerial.h>
+#define SpeakerPin 5 // 스피커에 연결할 핀을 buzzerPin이라는 이름으로 선언
 #define BT_RX 7 // RX를 7번핀으로 설정
 #define BT_TX 8 // TX를 8번핀으로 설정
 
@@ -19,14 +20,14 @@ boolean lastNextButton= LOW; // Declare the pressed state of the previous NextBu
 boolean currentNextButton= LOW; // Declares the pressed state of the current NextButton as a Boolean variable
 boolean lastResetButton= LOW; // Declare the pressed state of the previous ResetButton as a Boolean variable
 boolean currentResetButton= LOW; // Declares the pressed state of the current ResetButton as a Boolean variable
-boolean NextState= false; // 
-boolean ResetState = false; // 
+boolean NextState= false;
+boolean ResetState = false;
 
 void setup()
 {
   pinMode(NextButton, INPUT_PULLUP); // Assign NextButton (pin 2) as input
   pinMode(ResetButton, INPUT_PULLUP); // Assign ResetButton (pin 3) as input
-  Serial.begin(9600); // baut rate 9600으로 시리얼 통신
+  Serial.begin(9600); // baud rate 9600으로 시리얼 통신
   Serial.println("Hello! I am RemoteController!"); // 시리얼 모니터에 시작 문장 출력
   RCSerial.begin(9600); // 블루투스 통신 rate 9600으로 시작
 }
@@ -34,14 +35,18 @@ void setup()
 void loop()
 {
   if (RCSerial.available()) { // 블루투스 통신 인풋이 있을 때
-    Serial.write(RCSerial.read()); // 시리얼 통신으로 인풋 내용 출력
+    char c = (char)RCSerial.read(); // 블루투스 인풋을 char c에 저장
+    if(c=='A'){ // c가 'A'인 경우
+      tone(SpeakerPin,392); // '솔'음을 출력
+    }
+    Serial.write(c);
   }
   if (Serial.available()) { // 시리얼 통신으로 인풋이 있을 때
     RCSerial.write(Serial.read()); // 블루투스 통신으로 인풋 내용 출력
   }
   
   currentNextButton= debounce(lastNextButton, NextButton); //read debouncing NextButton state
-  if(lastNextButton== HIGH && currentNextButton== LOW) //press the NextButton
+  if(lastNextButton== HIGH && currentNextButton== LOW) // press the NextButton
   {
     NextState= !NextState; // NextState의 상태 변경
   }
@@ -53,17 +58,25 @@ void loop()
     ResetState= !ResetState; // ResetState의 상태 변경
   }
   lastResetButton= currentResetButton; //change the previous ResetButton value to the current ResetButton value
-
+  
   if(NextState==true){ // Next 버튼이 눌린 경우
     RCSerial.write('N'); // 블루투스 통신으로 'N'을 출력
+//    RCSerial.write('N'); // 블루투스 통신으로 'N'을 출력
     Serial.write('N'); // 시리얼 통신으로 'N'을 출력
     NextState=false; // NextState를 false로 초기화
+    noTone(SpeakerPin); // 스피커를 끔
   }
   if(ResetState==true){ // Reset 버튼이 눌린 경우
     RCSerial.write('R'); // 블루투스 통신으로 'R'을 출력
     Serial.write('R'); // 시리얼 통신으로 'R'을 출력
     ResetState=false; // ResetState를 false로 초기화
+    noTone(SpeakerPin); // 스피커를 끔
   }
+
+  // tone(SpeakerPin,262); // 도
+  // tone(SpeakerPin,330); // 미
+  // tone(SpeakerPin,392); // 솔
+  // noTone(SpeakerPin); // 음출력안함
 }
 
 boolean debounce(boolean last, int BUTTON) // 버튼의 기계적 노이즈를 제거하는 디바운스 함수

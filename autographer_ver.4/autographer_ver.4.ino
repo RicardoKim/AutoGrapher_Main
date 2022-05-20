@@ -1,11 +1,14 @@
 //xy축의 각도를 이용한 서보모터 제어 코드
 #include <Servo.h>
 #include "MPU9250.h"
+#include <SoftwareSerial.h>
 //https://github.com/hideakitai/MPU9250 에서 zip 파일로 추가
 MPU9250 mpu; // mpu라는 이름으로 MPU9250 설정
 
-#define X_SERVO_PIN 9 // x축 서보모터를 9번핀에 연결
-#define Y_SERVO_PIN 10 // y축 서보모터를 10번핀에 연결
+#define SE_RX 2 // 시리얼 RX를 2번핀으로 설정
+#define SE_TX 3 // 시리얼 TX를 3번핀으로 설정
+#define X_SERVO_PIN 10 // x축 서보모터를 9번핀에 연결
+#define Y_SERVO_PIN 9 // y축 서보모터를 10번핀에 연결
 #define rightLeft_servo_pin 11 // z축 회전 서보모터의 핀
 #define upDown_servo_pin 12 // y축 회전 서보모터의 핀
 
@@ -19,14 +22,20 @@ Servo Y_Servo;
 Servo rightLeft_Servo;
 Servo upDown_Servo;
 
+SoftwareSerial SerialtoBTC(SE_RX,SE_TX);
+
 int servo_X = X_initial;    //x축 각도(pitch)
 int servo_Y = Y_initial;    //y축 각도(roll)
 int prev_X = servo_X;       //기존 각도 유지를 위한 변수
 int prev_Y = servo_Y;
 int servo_rightLeft = rightLeft_initial; // z축 회전 서보모터의 초기각도
 int servo_upDown = upDown_initial; // y축 회전 서보모터의 초기각도
+
 int movement_data; // 시리얼로부터 받아올 움직일 방향 데이터
 int movement;      // null 값 무시를 위한 명령변수  
+
+int* info1 = (int*) malloc(8 * sizeof(int)); // 좌표 저장용 배열 1
+int* info2 = (int*) malloc(8 * sizeof(int)); // 좌표 저장용 배열 2
 
 int act = 0;                //처리 순서
 // 전역변수 넣기
@@ -36,6 +45,7 @@ void setup() {
   Serial.begin(115200); // 시리얼 통신의 baut rate를 115200으로 설정
   Wire.begin(); // mpu9250을 사용하기 위하여 I2C 통신을 초기화하고 활성화
   delay(2000); // 2초간 코드 진행 지연시킴
+  SerialtoBTC.begin(9600);
 
   if (!mpu.setup(0x68)) { // mpu의 셋업을 실행하고 연결이 되지 않았다면 아래 if문의 실행문을 실행
     while (1) { // mpu의 연결 오류시 오류문을 반복 출력
@@ -43,6 +53,7 @@ void setup() {
       delay(5000); // 5초 딜레이 후 while문 반복
     }
   }
+  mpu.calibrateAccelGyro();
   X_Servo.attach(X_SERVO_PIN); // X축 서보모터의 핀을 지정
   Y_Servo.attach(Y_SERVO_PIN); // Y축 서보모터의 핀을 지정
   rightLeft_Servo.attach(rightLeft_servo_pin); // z축 회전 서보모터 핀 연결
@@ -51,34 +62,49 @@ void setup() {
   Y_Servo.write(Y_initial); // Y축 서보모터의 초기 각을 지정
   rightLeft_Servo.write(rightLeft_initial); // Z축 서보모터의 초기 각을 지정
   upDown_Servo.write(upDown_initial); // 상하 조정용 Y축 서보모터의 초기 각을 지정
+  delay(500)
+  X_Servo.detach(); // X축 서보모터의 핀을 지정
+  Y_Servo.detach(); // Y축 서보모터의 핀을 지정
+  rightLeft_Servo.detach(); // z축 회전 서보모터 핀 연결
+  upDown_Servo.detach(); // 상하 조정용 y축 회전 서보모터 핀 연결
 
 
 }
 
 void loop() {
-  /*
-  while(1){
-    // 진행버튼과 리셋버튼이 있다고 상정하고 코드 구현
-    // 진행버튼 신호를 받으면 act를 1증가시킴 (초기값 0)
-    // 단 진행버튼 신호를 받아도 act가 3이면 그대로 3을 유지
-    // 진행 버튼 신호가 오면 위와 같이 act 상태를 변경하고 while문을 break
-    // 리셋버튼 신호를 받으면 act를 0으로 초기화함 (주의 : while문을 break하지 않음) <- 왜냐? 진행 버튼이 눌릴때만 밑의 switch문이 실행돼야함
+  if(SerialtoBTC.available()){
+    char c = (char)SerialtoBTC.read();
+    if(c=='N'){
+      if(act==0){
+        act=1;
+      }
+      else if(act==2){
+        act=3;
+      }
+    }
+    else if(c=='R'){
+      act=0;
+    }
+    else { // 리모컨 인풋이 아닌 경우
+      // 아마 쓸일 없을거 같긴 한데 일단 냅둠
+    }
   }
-  */
-  act++;              //모드 변경 
+  
   int loop_count = 0;          //루프 횟수 생각
   switch(act){
     case 1:           //레벨링
+      
       while(1){
+
         Leveling(loop_count);
         if(Leveling(loop_count)==true){
           break;
         }
         if(prev_X != servo_X){
-          move_servo(X_Servo,servo_X);//서보 움직이기
+          move_servo(X_Servo,X_SERVO_PIN,servo_X);//서보 움직이기
         }
         if(prev_Y != servo_Y){
-          move_servo(Y_Servo,servo_Y);
+          move_servo(Y_Servo,Y_SERVO_PIN,servo_Y);
         }
         prev_X = servo_X;       //기존 각도 유지를 위한 변수
         prev_Y = servo_Y;
@@ -86,18 +112,19 @@ void loop() {
         
       }
       loop_count=0;
+      
       delay(1000);
-      break;
+      break; // case 2 구현 후 break 지워서 act 1 종료시 act 2로 넘어가도록 수정 할 것!!!!!!!!!!!!!
     case 2:
       //get_frame(); // 구도에 사람 넣는 함수
       Serial.println("FrameWork");
-      while(1){
+      /*while(1){
         find_person();
         if(find_person() == true){
           Serial.println("target found");
           break;
         }
-      }
+      }*/
       delay(1000);
       break;
     case 3:
@@ -121,6 +148,8 @@ void print_roll_pitch_yaw() {
     Serial.print(", ");
     Serial.println(mpu.getRoll(), 2);
 }
+
+
 //수평 맞추는 움직임
 bool Leveling(int loopCount){               //초기에 불안정한 값 무시하기 위해 루프 횟수 입력
   
@@ -132,27 +161,33 @@ bool Leveling(int loopCount){               //초기에 불안정한 값 무시�
   }
   mpu.update(); 
   
-  tiltX = int(mpu.getPitch()); //계산된 현재 각도
-  tiltY = int(mpu.getRoll()); //계산된 현재 각도
+  tiltX = int(0.96*mpu.getPitch()+0.04*mpu.getAccX()); //계산된 현재 각도
+  tiltY = int(0.96*mpu.getRoll()+0.04*mpu.getAccY()); //계산된 현재 각도
   
-  Serial.println(tiltX);
-  Serial.println(tiltY);
+  
   if(abs(tiltX)>90||abs(tiltY)>90){
     return false;
   }
-  if(loopCount>300){                       //초기에 불안정한 값 무시하고 400회부터 변형
+  if(loop<200){
+    mpu.calibrateAccelGyro();
+    Serial.println("Calibration...");
+    Serial.print(tiltX);
+    Serial.print("  ");
+    Serial.println(tiltY);
+  }
+  if(loopCount>200){                       //초기에 불안정한 값 무시하고 400회부터 변형
     Serial.println("Leveling Started..."); // 함수 실행시 안내문 출력
-    if(tiltX<0){                            //x축이 -로 기울은 경우
-      if(servo_X<150){        
+    if(tiltX>0){                            //x축이 -로 기울은 경우
+      if(servo_X<135){        
         servo_X++;            //X 축 서보모터 각도 증가
       }
-      //X_Servo.write(servo_X); // x축 서보모터를 새로운 각도로 회전
+      //X_Servo.write(servo_X); // x축 서보12091모터를 새로운 각도로 회전
       Serial.print("Pitch is :");
       Serial.println(tiltX); // 지금 x축 돌린 각도가 몇인지 출력
       //Serial.println(servo_X);
     }
-    if(tiltX>0){            //x축이 +로 기울은 경우
-      if(servo_X>30){      
+    if(tiltX<0){            //x축이 +로 기울은 경우
+      if(servo_X>45){      
         servo_X--;          //x축 서보모터 각도 감소
       }      
       //X_Servo.write(servo_X); // x축 서보모터를 새로운 각도로 회전
@@ -161,8 +196,8 @@ bool Leveling(int loopCount){               //초기에 불안정한 값 무시�
       Serial.println(tiltX); // 지금 x축 돌린 각도가 몇인지 출력
       //Serial.println(servo_X);
     }
-    if(tiltY<0){            //y축이 -로 기울은 경우
-      if(servo_Y<150){
+    if(tiltY>0){            //y축이 -로 기울은 경우
+      if(servo_Y<135){
         servo_Y++;          //y축 서보모터 각도 증가
       }
       //Y_Servo.write(servo_Y); // y축 서보모터를 새로운 각도로 회전
@@ -170,8 +205,8 @@ bool Leveling(int loopCount){               //초기에 불안정한 값 무시�
       Serial.println(tiltY); // 지금 y축 돌린 각도가 몇인지 출력
       //Serial.println(servo_Y);
     }
-    if(tiltY>0){          //y축이 +로 기울은 경우
-      if(servo_Y>30){
+    if(tiltY<0){          //y축이 +로 기울은 경우
+      if(servo_Y>45){
         servo_Y--;        //y축 서보모터 각도 감소
       }
       //Y_Servo.write(servo_Y); // y축 서보모터를 새로운 각도로 회전
@@ -186,13 +221,50 @@ bool Leveling(int loopCount){               //초기에 불안정한 값 무시�
   return false;                 //수평이 아닌 경우 false 반환
 }
 
-int move_servo(Servo servo_motor, int ang){       //서보 돌리는 코드
-  int delay_rate = 20;              //속도조절을 위한 딜레이 시간 높을 수록 느리게
+int move_servo(Servo servo_motor,int servo_pin, int ang){       //서보 돌리는 코드
+  int delay_rate = 30;              //속도조절을 위한 딜레이 시간 높을 수록 느리게
+  servo_motor.attach(servo_pin); // X축 서보모터의 핀을 지정  
   servo_motor.write(ang);           //서보 움직임
-  delay(delay_rate);                
+  delay(delay_rate);            
+  servo_motor.detach();
+
   Serial.println("Done rotate");
-  
 }
+
+// 앱과의 통신을 통해 레퍼런스 좌표 두 개 받아오는 함수
+bool get_frame(){
+  bool Eightvalues = false; // 좌표 8개 들어왔는지 체크하는 bool
+  SerialtoBTC.write(2); // 블루투스 통신을 통해 앱에게 사진 찍으라고 시킴
+  while(!Eightvalues){
+    for(int i=0;i<8;i++){
+      info1[i]=0;
+      info1[i]=SerialtoBTC.parseInt(); // 받아온 좌표 8개를 info1에 저장
+    }
+    if(info1[7]!=0){
+      Eightvalues = true;
+    }
+  }
+
+//  대충 도리도리 20도 이동, 끄덕끄덕 ???도 이동
+//  Servo rightLeft_Servo;
+//  Servo upDown_Servo;
+//  #define rightLeft_servo_pin 11 // z축 회전 서보모터의 핀
+//  #define upDown_servo_pin 12 // y축 회전 서보모터의 핀
+  
+  Eightvalues = false; // 좌표 8개 들어왔는지 체크하는 bool
+  SerialtoBTC.write(2); // 블루투스 통신을 통해 앱에게 사진 찍으라고 시킴
+  while(!Eightvalues){
+    for(int i=0;i<8;i++){
+      info2[i]=0;
+      info2[i]=SerialtoBTC.parseInt(); // 받아온 좌표 8개를 info2에 저장
+    }
+    if(info2[7]!=0){
+      Eightvalues = true;
+    }
+  }
+}
+
+
 //구도 맞추는 움직임
 bool Move_Right(){ // z축 회전 서보모터가 오른쪽으로 회전하는 함수
   if(servo_rightLeft<180){ // 오른쪽으로 끝까지 회전할때까지
