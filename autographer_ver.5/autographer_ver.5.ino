@@ -117,8 +117,21 @@ void loop() {
       delay(1000);
       
     case 2:
-      //get_frame(); // 구도에 사람 넣는 함수
+      //도리도리 끄덕끄덕 초기값 90도 설정
+      servo_rightLeft = rightLeft_initial;
+      servo_upDown = upDown_initial;
+      move_servo(rightLeft_Servo,rightLeft_servo_pin,servo_rightLeft);
+      move_servo(upDown_Servo,upDown_servo_pin,servo_upDown);
+      
+      
       Serial.println("FrameWork");
+      while(1){
+        get_frame(); // 구도에 사람 넣는 함수
+        if(get_frame() == true){
+          Serial.println("done setting");
+          break;
+        }
+      }
       /*while(1){
         find_person();
         if(find_person() == true){
@@ -235,8 +248,26 @@ int move_servo(Servo servo_motor,int servo_pin, int ang){       //서보 돌리�
 
 
 //만약 0이 나오면 어차피 안 나온 것이다 
-// 앱과의 통신을 통해 레퍼런스 좌표 두 개 받아오는 함수
-//좌표 받는 코드
+//int a[8] 쓰지 않는 이유는?
+int* current_position = (int*) malloc(2*sizeof(int));   //초기 좌표 평균
+int* check_angle = (int*) malloc(2*sizeof(int));        //상 10도 좌10도 회전시 좌표 평균
+int* angle_difference = (int*) malloc(2*sizeof(int));   //움직여야하는 각도 설정
+//쓰고 나면 malloc은 해제 해줘야하지 않나?
+/*
+ 거리계산
+ z = 도리도리,y = 끄덕끄덕 x = 카메라와 사람 거리 , Ztheta = 카메라와 사람 각도 초기
+ z = x * tan(Ztheta)
+ y = x * sec(Ztheta) * tan (Ytheta)
+ if Ztheta = Ytheta = 10
+ difference[0] = x * tan 10
+ x = difference[0]/tan 10
+ 식에 대입하면
+ Ztheta = atan(z/x)
+ Ytheta = atan(y/(x*sec(Ztheta)))
+
+ */
+
+//좌표 받는 함수
 int* get_position(){
   int* pos = (int*) malloc(2*sizeof(int));
   int check_pos = 0;
@@ -259,47 +290,51 @@ int* get_position(){
   return pos;
 }
 
-bool find_person(int* difference){
+void find_person(){
+  int target = 50;
+    //상대적 길이
+  float relative_distance ;
+  relative_distance = (check_angle[0]-current_position[0])/tan(10);
+  if(current_position[0] != target){
+    angle_difference[0] = int(degrees(atan((current_position[0]-target)/relative_distance)));
+    //rightLeft 각도 변경
+    servo_rightLeft += angle_difference[0];
+    Serial.print("도리도리  ");
+    Serial.println(servo_rightLeft);
+  }
+  if(current_position[1] != target){
+    angle_difference[1] = int(degrees(atan(((current_position[1]-target)/(cos(angle_difference[0])*relative_distance)))));
+    //rightLeft 각도 변경
+    servo_upDown += angle_difference[1];
+    Serial.print("끄덕끄덕  ");
+    Serial.println(servo_upDown);
+  }
   
-
-
-
-
-
-
-  
-  return false;
-
 }
-//int a[8] 쓰지 않는 이유는?
-int* current_position = (int*) malloc(2*sizeof(int));   //초기 좌표 평균
-int* check_angle = (int*) malloc(2*sizeof(int));        //상 10도 좌10도 회전시 좌표 평균
-int* angle_difference = (int*) malloc(2*sizeof(int));  //10도 회전 시 구도 변화 측정
-//쓰고 나면 malloc은 해제 해줘야하지 않나?
+
 
 //구도 맞추는
-int get_frame(){
+
+bool get_frame(){
   int* angle_difference = (int*) malloc(2*sizeof(int));  //10도 회전 시 구도 변화 측정
   
   SerialtoBTC.write(2); // 블루투스 통신을 통해 앱에게 사진 찍으라고 시킴
   current_position = get_position();    //현재 중앙 좌표
   if(current_position[0]==0){
-    return 0;
+    return false;
   }
   
   move_servo(rightLeft_Servo,rightLeft_servo_pin,servo_rightLeft+10); //도.................리
   move_servo(upDown_Servo,upDown_servo_pin,servo_upDown+10);          //끄.................덕
-  
+  //10도 회전 시 구도 변화 측정
   SerialtoBTC.write(2); // 블루투스 통신을 통해 앱에게 사진 찍으라고 시킴
-  check_angle = get_position();         //기준치 변경시 구도 확인
+  check_angle = get_position();         //각도 변경시 위치 확인
   if(check_angle[0]==0){
-    return 0;
+    return false;
   }
-  angle_difference[0] = check_angle[0]-current_position[0];       //10도마다 생기는 차이
-  angle_difference[1] = check_angle[1]-current_position[1];
-  
-  find_person(angle_difference);
-  
-  return 1;
+  find_person();                  //사람 위치에 따른 각도 변경
+  move_servo(rightLeft_Servo,rightLeft_servo_pin,servo_rightLeft);//변경한 각도로 움직이기
+  move_servo(upDown_Servo,upDown_servo_pin,servo_upDown);
+  return true;
   
 }
