@@ -3,7 +3,11 @@
   <component name="DesignSurface">
     <option name="filePathToZoomLevelMap">
       <map>
+        <entry key="app/src/main/res/drawable/ic_launcher_foreground.xml" value="0.18" />
         <entry key="app/src/main/res/layout/activity_main.xml" value="0.14791666666666667" />
+        <entry key="app/src/main/res/layout/camera_main_2.xml" value="0.17135416666666667" />
+        <entry key="app/src/main/res/layout/layout_characteric_operation_button.xml" value="0.17135416666666667" />
+        <entry key="app/src/main/res/layout/layout_characteric_operation_et.xml" value="0.17135416666666667" />
       </map>
     </option>
   </component>
