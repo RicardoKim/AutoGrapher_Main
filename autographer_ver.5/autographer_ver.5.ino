@@ -31,6 +31,12 @@ int prev_Y = servo_Y;
 int servo_rightLeft = rightLeft_initial; // z축 회전 서보모터의 초기각도
 int servo_upDown = upDown_initial; // y축 회전 서보모터의 초기각도
 
+//만약 0이 나오면 어차피 안 나온 것이다 
+//int a[8] 쓰지 않는 이유는?
+int* current_position = (int*) malloc(2*sizeof(int));   //초기 좌표 평균
+int* check_angle = (int*) malloc(2*sizeof(int));        //상 10도 좌10도 회전시 좌표 평균
+int* angle_difference = (int*) malloc(2*sizeof(int));   //움직여야하는 각도 설정
+//쓰고 나면 malloc은 해제 해줘야하지 않나?
 //???????????????????????????????????????
 //int movement_data; // 시리얼로부터 받아올 움직일 방향 데이터
 //int movement;      // null 값 무시를 위한 명령변수  
@@ -142,7 +148,7 @@ void loop() {
       delay(1000);
       break;
     case 3:
-      //kimchi(); // 촬영하는 함수 김치~
+      SerialtoBTC.write(2);                 // 블루투스 통신을 통해 앱에게 사진 찍으라고 시킴
       Serial.println("Kimchi");
       delay(1000);
       break;
@@ -153,6 +159,9 @@ void loop() {
       act=0;
       break;
   }
+  free(current_position);
+  free(check_angle);
+  free(angle_difference);
 }
 void print_roll_pitch_yaw() {
     Serial.print("Yaw, Pitch, Roll: ");
@@ -182,7 +191,7 @@ bool Leveling(int loopCount){               //초기에 불안정한 값 무시�
   if(abs(tiltX)>90||abs(tiltY)>90){
     return false;
   }
-  if(loop<200){
+  if(loopCount<200){
     mpu.calibrateAccelGyro();
     Serial.println("Calibration...");
     Serial.print(tiltX);
@@ -240,72 +249,74 @@ int move_servo(Servo servo_motor,int servo_pin, int ang){       //서보 돌리�
   servo_motor.attach(servo_pin); // X축 서보모터의 핀을 지정  
   servo_motor.write(ang);           //서보 움직임
   delay(delay_rate);            
-  servo_motor.detach();
+  servo_motor.detach();             //노이즈 막기 위한 서보모터 분리
   Serial.println("Done rotate");
 }
 
 
 
 
-//만약 0이 나오면 어차피 안 나온 것이다 
-//int a[8] 쓰지 않는 이유는?
-int* current_position = (int*) malloc(2*sizeof(int));   //초기 좌표 평균
-int* check_angle = (int*) malloc(2*sizeof(int));        //상 10도 좌10도 회전시 좌표 평균
-int* angle_difference = (int*) malloc(2*sizeof(int));   //움직여야하는 각도 설정
-//쓰고 나면 malloc은 해제 해줘야하지 않나?
-/*
- 거리계산
- z = 도리도리,y = 끄덕끄덕 x = 카메라와 사람 거리 , Ztheta = 카메라와 사람 각도 초기
- z = x * tan(Ztheta)
- y = x * sec(Ztheta) * tan (Ytheta)
- if Ztheta = Ytheta = 10
- difference[0] = x * tan 10
- x = difference[0]/tan 10
- 식에 대입하면
- Ztheta = atan(z/x)
- Ytheta = atan(y/(x*sec(Ztheta)))
 
- */
+
 
 //좌표 받는 함수
 int* get_position(){
-  int* pos = (int*) malloc(2*sizeof(int));
-  int check_pos = 0;
-  for(int i=0;i<8;i++){    
+  int* pos = (int*) malloc(2*sizeof(int));    //반환값
+  int check_pos = 0;                          //좌표 받기 위한 임시 수
+  for(int i=0;i<8;i++){                     //8회 좌표 받기
     check_pos = SerialtoBTC.parseInt();     //좌표 받기
-    if(check_pos == 0){
+    if(check_pos == 0){                     //null 값은 0으로 나오므로 멈추기 {0,0} 반환
       pos[0] = 0;
       pos[1] = 0;
       return pos;
     }
     if(i%2 == 0){
-      pos[0]+=check_pos;
+      pos[0]+=check_pos;                  //(도리도리)좌표 합산
     }
     if(i%2 == 1){
-      pos[1]+=check_pos;
+      pos[1]+=check_pos;                  //(끄덕끄덕) 좌표 환산
     }
     pos[0] = pos[0]/4;
-    pos[1] = pos[1]/4;
+    pos[1] = pos[1]/4;                    //평균 위치 좌표 
   }
-  return pos;
+  return pos;                             //계산된 좌표 반환
 }
-
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~수정~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/*
+ 거리계산(x,y) 좌표로 가정한다면
+ x 방향 단위 i    y 방향 단위 j
+ L = 수직 거리 상수
+ x (i) = L * tan(Xtheta) (i)
+ y (j) = L * sec(Xtheta) * tan(Ytheta) (i)
+ if Xtheta = 10, Ytheta = 10 degrees 좌표값 받아둠
+ x (i) = L * tan(10) (i)
+ L = x/tan(10)
+ y (j) = L * sec(10) * tan(10) (i)
+ (i) = y/(L * sec(10) * tan(10)) (j)
+     = y/(x * sec(10)) (j)
+ 식 대입
+ Xtheta = atan(x/L)
+ Ytheta = atan(y/(L*sec(Xtheta) * y/(x * sec(10))
+ */
 void find_person(){
+  //목표지점 - {50,50} => 중앙
   int target = 50;
-    //상대적 길이
-  float relative_distance ;
-  relative_distance = (check_angle[0]-current_position[0])/tan(10);
-  if(current_position[0] != target){
-    angle_difference[0] = int(degrees(atan((current_position[0]-target)/relative_distance)));
+  //상대적 직선 거리
+  float relative_distance;
+  float changeXY;
+  relative_distance = (check_angle[0]-current_position[0])/tan(radians(10));
+  changeXY = (check_angle[1]-current_position[1])*cos(radians(10))/(check_angle[0]-current_position[0])
+  if(current_position[0] != target){                                          //목표지점이 아닌경우 실행
+    angle_difference[0] = int(degrees(atan((current_position[0]-target)/relative_distance)));  //변경각도 계산 범위 +-90도
     //rightLeft 각도 변경
-    servo_rightLeft += angle_difference[0];
+    servo_rightLeft += angle_difference[0];             //초기각도 90도 기준 변경각도 부여
     Serial.print("도리도리  ");
     Serial.println(servo_rightLeft);
   }
   if(current_position[1] != target){
-    angle_difference[1] = int(degrees(atan(((current_position[1]-target)/(cos(angle_difference[0])*relative_distance)))));
+    angle_difference[1] = int(degrees(atan((((current_position[1]-target)*cos(angle_difference[0]))/(relative_distance)*changeXY);//변경각도 계산 +-90도
     //rightLeft 각도 변경
-    servo_upDown += angle_difference[1];
+    servo_upDown += angle_difference[1];                //초기각도 90도 기준 변경각도 부여
     Serial.print("끄덕끄덕  ");
     Serial.println(servo_upDown);
   }
@@ -314,23 +325,22 @@ void find_person(){
 
 
 //구도 맞추는
-
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~수정~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 bool get_frame(){
-  int* angle_difference = (int*) malloc(2*sizeof(int));  //10도 회전 시 구도 변화 측정
-  
-  SerialtoBTC.write(2); // 블루투스 통신을 통해 앱에게 사진 찍으라고 시킴
+  Serial.println("Targeting Started..."); // 함수 실행시 안내문 
+  SerialtoBTC.write(2);                 // 블루투스 통신을 통해 앱에게 사진 찍으라고 시킴
   current_position = get_position();    //현재 중앙 좌표
   if(current_position[0]==0){
-    return false;
+    return false;                       //null값 나온 경우 재실행하기 위해 false 반환
   }
   
-  move_servo(rightLeft_Servo,rightLeft_servo_pin,servo_rightLeft+10); //도.................리
-  move_servo(upDown_Servo,upDown_servo_pin,servo_upDown+10);          //끄.................덕
+  move_servo(rightLeft_Servo,rightLeft_servo_pin,servo_rightLeft+10); //우 10도 움직임
+  move_servo(upDown_Servo,upDown_servo_pin,servo_upDown+10);          //상 10도 움직임
   //10도 회전 시 구도 변화 측정
   SerialtoBTC.write(2); // 블루투스 통신을 통해 앱에게 사진 찍으라고 시킴
   check_angle = get_position();         //각도 변경시 위치 확인
   if(check_angle[0]==0){
-    return false;
+    return false;                       //null값 나온 경우 재실행하기 위해 false 반환
   }
   find_person();                  //사람 위치에 따른 각도 변경
   move_servo(rightLeft_Servo,rightLeft_servo_pin,servo_rightLeft);//변경한 각도로 움직이기
@@ -338,3 +348,8 @@ bool get_frame(){
   return true;
   
 }
+
+//만약 0이 나오면 어차피 안 나온 것이다 
+//int a[8] 쓰지 않는 이유는?
+
+//쓰고 나면 malloc은 해제 해줘야하지 않나?
