@@ -159,9 +159,6 @@ void loop() {
       act=0;
       break;
   }
-  free(current_position);
-  free(check_angle);
-  free(angle_difference);
 }
 void print_roll_pitch_yaw() {
     Serial.print("Yaw, Pitch, Roll: ");
@@ -305,7 +302,7 @@ void find_person(){
   float relative_distance;
   float changeXY;
   relative_distance = (check_angle[0]-current_position[0])/tan(radians(10));
-  changeXY = (check_angle[1]-current_position[1])*cos(radians(10))/(check_angle[0]-current_position[0])
+  changeXY = (check_angle[1]-current_position[1])*cos(radians(10))/(check_angle[0]-current_position[0]);
   if(current_position[0] != target){                                          //목표지점이 아닌경우 실행
     angle_difference[0] = int(degrees(atan((current_position[0]-target)/relative_distance)));  //변경각도 계산 범위 +-90도
     //rightLeft 각도 변경
@@ -314,7 +311,7 @@ void find_person(){
     Serial.println(servo_rightLeft);
   }
   if(current_position[1] != target){
-    angle_difference[1] = int(degrees(atan((((current_position[1]-target)*cos(angle_difference[0]))/(relative_distance)*changeXY);//변경각도 계산 +-90도
+    angle_difference[1] = int(degrees(atan(((current_position[1]-target)*cos(angle_difference[0]))/(relative_distance)*changeXY)));//변경각도 계산 +-90도
     //rightLeft 각도 변경
     servo_upDown += angle_difference[1];                //초기각도 90도 기준 변경각도 부여
     Serial.print("끄덕끄덕  ");
@@ -351,5 +348,4 @@ bool get_frame(){
 
 //만약 0이 나오면 어차피 안 나온 것이다 
 //int a[8] 쓰지 않는 이유는?
-
 //쓰고 나면 malloc은 해제 해줘야하지 않나?
