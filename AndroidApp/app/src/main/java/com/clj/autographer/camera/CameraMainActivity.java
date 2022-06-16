@@ -236,7 +236,7 @@ public class CameraMainActivity  extends AppCompatActivity implements View.OnCli
                         new OnFailureListener() {
                             @Override
                             public void onFailure(@NonNull Exception e) {
-                                Toast.makeText(CameraMainActivity.this, "Pose Tespit Edilemedi",Toast.LENGTH_SHORT).show();
+                                Toast.makeText(CameraMainActivity.this, "Pose Detection Fail",Toast.LENGTH_SHORT).show();
                             }
                         });
     }
@@ -322,42 +322,42 @@ public class CameraMainActivity  extends AppCompatActivity implements View.OnCli
 
             PointF leftShoulderP = leftShoulder.getPosition();
 
-            float lShoulderX = leftShoulderP.x;
+            int lShoulderX = (int)leftShoulderP.x;
             System.out.println(lShoulderX);
             System.out.println(image_width);
-            lShoulderX = (int) (lShoulderX *100/ image_width);
+//            lShoulderX = (int) (lShoulderX *100/ image_width);
 
 
             int lShoulderY = (int) leftShoulderP.y;
-            lShoulderY = (int) (lShoulderY *100/ image_height);
+//            lShoulderY = (int) (lShoulderY *100/ image_height);
 
 
             PointF rightSoulderP = rightShoulder.getPosition();
 
             int rShoulderX = (int)rightSoulderP.x;
-            rShoulderX = (int) (rShoulderX *100/ image_width);
+//            rShoulderX = (int) (rShoulderX *100/ image_width);
 
             int rShoulderY = (int)rightSoulderP.y;
-            rShoulderY = (int) (rShoulderY * 100 / image_height);
+//            rShoulderY = (int) (rShoulderY * 100 / image_height);
 
             PointF leftAnkleP = leftAnkle.getPosition();
             int lAnkleX = (int) leftAnkleP.x;
 
-            lAnkleX = (int) (lAnkleX * 100 / image_width);
+//            lAnkleX = (int) (lAnkleX * 100 / image_width);
 
             int lAnkleY = (int) leftAnkleP.y;
 
-            lAnkleY = (int) (lAnkleY * 100 / image_height);
+//            lAnkleY = (int) (lAnkleY * 100 / image_height);
 
             PointF rightAnkleP = rightAnkle.getPosition();
             int rAnkleX = (int) rightAnkleP.x;
-            rAnkleX = (int) (rAnkleX * 100 / image_width);
+//            rAnkleX = (int) (rAnkleX * 100 / image_width);
 
             int rAnkleY = (int) rightAnkleP.y;
+//
+//            rAnkleY = (int) (rAnkleY * 100 / image_height);
 
-            rAnkleY = (int) (rAnkleY * 100 / image_height);
-
-            String data = lShoulderX + "," + lShoulderY +"," + rShoulderX +"," + rShoulderY +"," + lAnkleX +"," + lAnkleY +"," + rAnkleX +"," + rAnkleY;
+            String data = lShoulderX + " " + lShoulderY +" " + rShoulderX +" " + rShoulderY +" " + lAnkleX +" " + lAnkleY +" " + rAnkleX +" " + rAnkleY;
             System.out.println("Processed data : " + data);
             sendingDataToHM10(data);
             cameraViewPose.start();
@@ -429,13 +429,14 @@ public class CameraMainActivity  extends AppCompatActivity implements View.OnCli
                                     @Override
                                     public void run() {
                                         String command = hexToString(HexUtil.formatHexString(data, false));
-
+                                        System.out.println(command);
                                         try{
                                             if(command == " 2" || Integer.parseInt(command) == 2){
                                                 poseDetect();
                                             }
                                             else if(command == " 3" || Integer.parseInt(command) == 3){
                                                 takephoto();
+                                                sendingDataToHM10("K");
                                             }
                                             System.gc();
                                         }catch(Exception e){

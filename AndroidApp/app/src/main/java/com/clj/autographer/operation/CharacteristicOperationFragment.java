@@ -355,6 +355,7 @@ public class CharacteristicOperationFragment extends Fragment {
                                         try{
                                             String command = hexToString(HexUtil.formatHexString(data, false));
                                             System.out.println(command);
+                                            System.out.println("==");
                                             if(command.contains("1")){
 
                                                 Intent intent = new Intent(getActivity(), CameraMainActivity.class);
